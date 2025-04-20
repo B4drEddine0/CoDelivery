@@ -55,45 +55,61 @@
             </div>
             
             <div class="bg-white rounded-xl shadow-lg p-6">
-                <form>
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
                             <input type="text" id="first-name" name="first-name" 
-                                   class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="Jean">
+                                   class="w-full px-3 py-2 rounded-lg border @error('first-name') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="Jean" value="{{ old('first-name') }}" required>
+                            @error('first-name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
                             <input type="text" id="last-name" name="last-name" 
-                                   class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="Dupont">
+                                   class="w-full px-3 py-2 rounded-lg border @error('last-name') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="Dupont" value="{{ old('last-name') }}" required>
+                            @error('last-name')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input type="email" id="email" name="email" 
-                                   class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="jean.dupont@example.com">
+                                   class="w-full px-3 py-2 rounded-lg border @error('email') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="jean.dupont@example.com" value="{{ old('email') }}" required>
+                            @error('email')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
                             <input type="tel" id="phone" name="phone" 
-                                   class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="+33 6 12 34 56 78">
+                                   class="w-full px-3 py-2 rounded-lg border @error('phone') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="+33 6 12 34 56 78" value="{{ old('phone') }}">
+                            @error('phone')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
                             <input type="password" id="password" name="password" 
-                                   class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="••••••••">
+                                   class="w-full px-3 py-2 rounded-lg border @error('password') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="••••••••" required>
+                            @error('password')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmer</label>
-                            <input type="password" id="confirm-password" name="confirm-password" 
+                            <input type="password" id="password_confirmation" name="password_confirmation" 
                                    class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="••••••••">
+                                   placeholder="••••••••" required>
                         </div>
                         
                         <div class="md:col-span-2">
@@ -104,16 +120,7 @@
                                 <option value="courier">Livreur - Je souhaite effectuer des livraisons</option>
                             </select>
                         </div>
-                        
-                        <div class="md:col-span-2 my-2">
-                            <div class="flex items-start">
-                                <input id="terms" name="terms" type="checkbox" class="h-4 w-4 mt-1 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
-                                <label for="terms" class="ml-2 block text-xs text-gray-700">
-                                    J'accepte les <a href="#" class="text-orange-600 hover:text-orange-500">conditions générales</a> et la <a href="#" class="text-orange-600 hover:text-orange-500">politique de confidentialité</a>
-                                </label>
-                            </div>
-                        </div>
-                        
+                          
                         <div class="md:col-span-2">
                             <button type="submit" class="w-full px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all font-medium">
                                 S'inscrire
@@ -148,13 +155,13 @@
                 <div class="text-center mt-3">
                     <p class="text-xs text-gray-600">
                         Vous avez déjà un compte?
-                        <a href="login.html" class="font-medium text-orange-600 hover:text-orange-500">Se connecter</a>
+                        <a href="{{ route('login') }}" class="font-medium text-orange-600 hover:text-orange-500">Se connecter</a>
                     </p>
                 </div>
             </div>
 
             <div class="text-center mt-3">
-                <a href="index.html" class="text-xs font-medium text-orange-600 hover:text-orange-500">
+                <a href="{{ url('/') }}" class="text-xs font-medium text-orange-600 hover:text-orange-500">
                     <i class="fas fa-arrow-left mr-1"></i>Retour à l'accueil
                 </a>
             </div>

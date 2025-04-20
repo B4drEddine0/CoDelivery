@@ -55,24 +55,31 @@
             </div>
             
             <div class="bg-white rounded-2xl shadow-xl p-8">
-                <form>
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
                     <div class="space-y-6">
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <input type="email" id="email" name="email" 
-                                   class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="votre@email.com">
+                                   class="w-full px-4 py-3 rounded-xl border @error('email') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="votre@email.com" value="{{ old('email') }}" required>
+                            @error('email')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
                             <input type="password" id="password" name="password" 
-                                   class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="••••••••">
+                                   class="w-full px-4 py-3 rounded-xl border @error('password') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                   placeholder="••••••••" required>
+                            @error('password')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
-                                <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
+                                <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
                                 <label for="remember-me" class="ml-2 block text-sm text-gray-700">Se souvenir de moi</label>
                             </div>
                             <a href="#" class="text-sm font-medium text-orange-600 hover:text-orange-500">Mot de passe oublié?</a>
@@ -110,13 +117,13 @@
                 <div class="text-center mt-6">
                     <p class="text-sm text-gray-600">
                         Vous n'avez pas de compte?
-                        <a href="register.html" class="font-medium text-orange-600 hover:text-orange-500">S'inscrire</a>
+                        <a href="{{ route('register') }}" class="font-medium text-orange-600 hover:text-orange-500">S'inscrire</a>
                     </p>
                 </div>
             </div>
 
             <div class="text-center mt-6">
-                <a href="index.html" class="text-sm font-medium text-orange-600 hover:text-orange-500">
+                <a href="{{ url('/') }}" class="text-sm font-medium text-orange-600 hover:text-orange-500">
                     <i class="fas fa-arrow-left mr-2"></i>Retour à l'accueil
                 </a>
             </div>
