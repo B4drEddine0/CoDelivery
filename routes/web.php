@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('client')->name('client.')->group(function () {
         Route::middleware(\App\Http\Middleware\ClientMiddleware::class)->group(function () {
             Route::get('/dashboard', [ClientController::class, 'dashboard'])->name('dashboard');
+            Route::get('/commands', [ClientController::class, 'commands'])->name('commands');
 
             Route::get('/commands/create', [CommandController::class, 'create'])->name('commands.create');
             Route::post('/commands', [CommandController::class, 'store'])->name('commands.store');

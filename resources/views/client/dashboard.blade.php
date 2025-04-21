@@ -67,8 +67,8 @@
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-white hover:text-orange-300 transition-colors">Mes commandes</a>
-                    <a href="#" class="text-white hover:text-orange-300 transition-colors">Historique</a>
+                    <a href="{{ route('client.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Home</a>
+                    <a href="{{ route('client.commands') }}" class="text-white hover:text-orange-300 transition-colors">Mes commandes</a>
                     <a href="#" class="text-white hover:text-orange-300 transition-colors">Aide</a>
                     
                     <!-- User Profile -->
@@ -179,7 +179,7 @@
                         <span class="text-green-600 font-medium">
                             @if($ongoingCommand->status == 'accepted')
                                 Commande acceptée
-                            @elseif($ongoingCommand->status == 'in_delivery')
+                            @elseif($ongoingCommand->status == 'in_progress')
                                 En cours de livraison
                             @endif
                         </span>
@@ -317,7 +317,15 @@
         
         <!-- Previous Orders -->
         <div>
-            <h2 class="text-xl font-semibold mb-4">Commandes récentes</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Commandes récentes</h2>
+                <a href="{{ route('client.commands') }}" class="text-orange-600 hover:text-orange-700 flex items-center">
+                    Voir toutes les commandes
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -344,16 +352,16 @@
                                             $statusColors = [
                                                 'pending' => 'bg-yellow-100 text-yellow-800',
                                                 'accepted' => 'bg-blue-100 text-blue-800',
-                                                'in_delivery' => 'bg-orange-100 text-orange-800',
-                                                'completed' => 'bg-green-100 text-green-800',
+                                                'in_progress' => 'bg-orange-100 text-orange-800',
+                                                'delivered' => 'bg-green-100 text-green-800',
                                                 'cancelled' => 'bg-red-100 text-red-800',
                                             ];
                                             
                                             $statusLabels = [
                                                 'pending' => 'En attente',
                                                 'accepted' => 'Acceptée',
-                                                'in_delivery' => 'En livraison',
-                                                'completed' => 'Livrée',
+                                                'in_progress' => 'En livraison',
+                                                'delivered' => 'Livrée',
                                                 'cancelled' => 'Annulée',
                                             ];
                                         @endphp
