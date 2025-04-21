@@ -103,15 +103,15 @@
         <div class="mb-8 bg-gradient-to-r from-orange-600 to-orange-800 rounded-2xl p-8 text-white">
             <div class="md:flex items-center justify-between">
                 <div class="mb-4 md:mb-0">
-                    <h1 class="text-2xl font-bold mb-2">Bonjour, Jean Dupont!</h1>
+                    <h1 class="text-2xl font-bold mb-2">Bonjour, {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}!</h1>
                     <p>Que souhaitez-vous commander aujourd'hui?</p>
                 </div>
-                <button class="bg-white text-orange-600 hover:bg-orange-100 rounded-full px-8 py-3 font-semibold flex items-center space-x-2 transition-all">
+                <a href="{{ route('client.commands.create') }}" class="bg-white text-orange-600 hover:bg-orange-100 rounded-full px-8 py-3 font-semibold flex items-center space-x-2 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     <span>Créer une commande</span>
-                </button>
+                </a>
             </div>
         </div>
         
@@ -166,29 +166,50 @@
         </div>
         
         <!-- Ongoing Order (if any) -->
+        @if($ongoingCommand)
         <div class="mb-8 bg-white rounded-xl p-6 shadow-sm border-l-4 border-orange-500">
             <h2 class="text-xl font-semibold mb-4">Commande en cours</h2>
             <div class="flex flex-col md:flex-row md:items-center justify-between">
                 <div class="mb-4 md:mb-0">
-                    <p class="text-gray-700">Restaurant - <span class="font-medium">McDonald's</span></p>
+                    <p class="text-gray-700">{{ ucfirst($ongoingCommand->service_type) }} - <span class="font-medium">{{ $ongoingCommand->establishment_name }}</span></p>
                     <div class="mt-2 flex items-center space-x-2">
                         <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                             <i class="fa-solid fa-truck text-green-600 text-sm"></i>
                         </div>
-                        <span class="text-green-600 font-medium">En route - Arrivée dans 12 min</span>
+                        <span class="text-green-600 font-medium">
+                            @if($ongoingCommand->status == 'accepted')
+                                Commande acceptée
+                            @elseif($ongoingCommand->status == 'in_delivery')
+                                En cours de livraison
+                            @endif
+                        </span>
                     </div>
                 </div>
                 
                 <div class="flex space-x-3">
-                    <button class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
+                    <a href="{{ route('client.commands.show', $ongoingCommand->id) }}" class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
                         Détails
-                    </button>
+                    </a>
                     <button class="bg-orange-100 text-orange-600 px-4 py-2 rounded-lg hover:bg-orange-200">
                         Suivre
                     </button>
                 </div>
             </div>
         </div>
+        @else
+        <div class="mb-8 bg-white rounded-xl p-6 shadow-sm border-l-4 border-gray-300">
+            <h2 class="text-xl font-semibold mb-4">Commande en cours</h2>
+            <p class="text-gray-500">Vous n'avez aucune commande en cours actuellement.</p>
+            <div class="mt-4">
+                <a href="{{ route('client.commands.create') }}" class="inline-flex items-center text-orange-600 hover:text-orange-700">
+                    <span>Créer une nouvelle commande</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        @endif
         
         <!-- Available Delivery Drivers -->
         <div class="mb-8">
@@ -311,42 +332,48 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05/06/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Restaurant</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Burger King</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">28.50 €</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Livré</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="#" class="text-orange-600 hover:text-orange-900">Détails</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">02/06/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Pharmacie</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Pharmacie Centrale</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">42.75 €</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Livré</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="#" class="text-orange-600 hover:text-orange-900">Détails</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">28/05/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">Courses</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Carrefour Express</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">56.20 €</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Livré</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="#" class="text-orange-600 hover:text-orange-900">Détails</a>
-                                </td>
-                            </tr>
+                            @if($recentCommands->count() > 0)
+                                @foreach($recentCommands as $command)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $command->created_at->format('d/m/Y') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ ucfirst($command->service_type) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $command->establishment_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($command->price, 2) }} DH</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @php
+                                            $statusColors = [
+                                                'pending' => 'bg-yellow-100 text-yellow-800',
+                                                'accepted' => 'bg-blue-100 text-blue-800',
+                                                'in_delivery' => 'bg-orange-100 text-orange-800',
+                                                'completed' => 'bg-green-100 text-green-800',
+                                                'cancelled' => 'bg-red-100 text-red-800',
+                                            ];
+                                            
+                                            $statusLabels = [
+                                                'pending' => 'En attente',
+                                                'accepted' => 'Acceptée',
+                                                'in_delivery' => 'En livraison',
+                                                'completed' => 'Livrée',
+                                                'cancelled' => 'Annulée',
+                                            ];
+                                        @endphp
+                                        
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColors[$command->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                            {{ $statusLabels[$command->status] ?? ucfirst($command->status) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="{{ route('client.commands.show', $command->id) }}" class="text-orange-600 hover:text-orange-900">Détails</a>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                                        Vous n'avez pas encore de commandes. <a href="{{ route('client.commands.create') }}" class="text-orange-600 hover:underline">Créer votre première commande</a>.
+                                    </td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>

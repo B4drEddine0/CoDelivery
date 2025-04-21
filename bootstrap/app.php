@@ -11,7 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Middleware is registered in bootstrap/middleware.php
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

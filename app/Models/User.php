@@ -89,4 +89,24 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+    
+    /**
+     * Get commands created by the user as a client.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function clientCommands(): HasMany
+    {
+        return $this->hasMany(Command::class, 'client_id');
+    }
+    
+    /**
+     * Get commands assigned to the user as a livreur.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function livreurCommands(): HasMany
+    {
+        return $this->hasMany(Command::class, 'livreur_id');
+    }
 }
