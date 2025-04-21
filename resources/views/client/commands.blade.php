@@ -43,7 +43,6 @@
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('client.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Home</a>
                     <a href="{{ route('client.commands') }}" class="text-white hover:text-orange-300 transition-colors border-b-2 border-orange-500 pb-1">Mes commandes</a>
-                    <a href="#" class="text-white hover:text-orange-300 transition-colors">Aide</a>
                     
                     <!-- User Profile -->
                     <div class="relative">

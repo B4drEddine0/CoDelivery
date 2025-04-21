@@ -68,16 +68,14 @@
                 
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('client.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Home</a>
-                    <a href="{{ route('client.commands') }}" class="text-white hover:text-orange-300 transition-colors">Mes commandes</a>
-                    <a href="#" class="text-white hover:text-orange-300 transition-colors">Aide</a>
-                    
-                    <!-- User Profile -->
-                    <div class="relative">
+                    <a href="{{ route('client.commands') }}" class="text-white hover:text-orange-300 transition-colors">Mes commandes</a>                    
+                     <!-- User Profile -->
+                     <div class="relative">
                         <button class="flex items-center space-x-2 focus:outline-none">
                             <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
-                                <span class="font-semibold text-sm">JD</span>
+                                <span class="font-semibold text-sm">{{ substr(Auth::user()->first_name, 0, 1) }}{{ substr(Auth::user()->last_name, 0, 1) }}</span>
                             </div>
-                            <span>Jean Dupont</span>
+                            <span>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
