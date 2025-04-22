@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CommandController extends Controller
 {
-    /**
-     * Display a listing of the commands.
-     */
+    
     public function index()
     {
         $user = Auth::user();
@@ -29,22 +27,17 @@ class CommandController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new command.
-     */
+  
     public function create()
     {
         if (!Auth::user()->isClient()) {
             return redirect()->route('dashboard')->with('error', 'Seuls les clients peuvent créer des commandes.');
         }
         
-        // Return the view directly without any additional processing
         return view('client.create');
     }
 
-    /**
-     * Store a newly created command in storage.
-     */
+    
     public function store(Request $request)
     {
         if (!Auth::user()->isClient()) {
@@ -85,9 +78,7 @@ class CommandController extends Controller
             ->with('success', 'Commande créée avec succès! Un livreur va bientôt la prendre en charge.');
     }
 
-    /**
-     * Display the specified command.
-     */
+    
     public function show(Command $command)
     {
         $user = Auth::user();
@@ -101,9 +92,7 @@ class CommandController extends Controller
             ->with('error', 'Vous n\'êtes pas autorisé à voir cette commande.');
     }
 
-    /**
-     * Accept a command (for livreurs).
-     */
+    
     public function accept(Command $command)
     {
         $user = Auth::user();
@@ -128,9 +117,7 @@ class CommandController extends Controller
             ->with('success', 'Commande acceptée avec succès!');
     }
 
-    /**
-     * Update the status of a command to in_progress.
-     */
+    
     public function startDelivery(Command $command)
     {
         $user = Auth::user();
@@ -153,9 +140,7 @@ class CommandController extends Controller
             ->with('success', 'Commande en cours de livraison!');
     }
 
-    /**
-     * Update the status of a command to delivered.
-     */
+    
     public function completeDelivery(Command $command)
     {
         $user = Auth::user();
@@ -179,9 +164,7 @@ class CommandController extends Controller
             ->with('success', 'Commande livrée avec succès!');
     }
 
-    /**
-     * Cancel a command.
-     */
+    
     public function cancel(Command $command)
     {
         $user = Auth::user();

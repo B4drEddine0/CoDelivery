@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoDelivery - Tableau de bord client</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -70,8 +71,8 @@
                     <a href="{{ route('client.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Home</a>
                     <a href="{{ route('client.commands') }}" class="text-white hover:text-orange-300 transition-colors">Mes commandes</a>                    
                      <!-- User Profile -->
-                     <div class="relative">
-                        <button class="flex items-center space-x-2 focus:outline-none">
+                     <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
                             <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
                                 <span class="font-semibold text-sm">{{ substr(Auth::user()->first_name, 0, 1) }}{{ substr(Auth::user()->last_name, 0, 1) }}</span>
                             </div>
@@ -80,6 +81,21 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50" style="display: none;">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        Se déconnecter
+                                    </div>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 

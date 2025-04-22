@@ -7,9 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ClientController extends Controller
 {
-    /**
-     * Display the client dashboard.
-     */
+   
     public function dashboard()
     {
         $user = Auth::user();
@@ -30,26 +28,21 @@ class ClientController extends Controller
         ]);
     }
     
-    /**
-     * Display all commands for the logged-in client.
-     */
+ 
     public function commands(Request $request)
     {
         $user = Auth::user();
         
         $query = $user->clientCommands()->latest();
         
-        // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
         
-        // Filter by service type
         if ($request->filled('service_type')) {
             $query->where('service_type', $request->service_type);
         }
         
-        // Search by title or establishment name
         if ($request->filled('search')) {
             $search = '%' . $request->search . '%';
             $query->where(function($q) use ($search) {

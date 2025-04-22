@@ -79,7 +79,7 @@
                         <a href="#services" class="text-white hover:text-orange-300 transition-colors">Services</a>
                         <a href="#how-it-works" class="text-white hover:text-orange-300 transition-colors">Comment ça marche</a>
                         <a href="contact.html" class="text-white hover:text-orange-300 transition-colors">Contact</a>
-                        <a href="register.html">
+                        <a href="login">
                         <button class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full transition-all">
                             Connexion
                         </button>

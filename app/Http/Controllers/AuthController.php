@@ -21,7 +21,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle user registration.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
@@ -66,7 +65,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Show the login form.
      *
      * @return \Illuminate\View\View
      */
@@ -76,7 +74,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle user login.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
@@ -105,7 +102,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Log the user out.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
