@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommandController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\LivreurController;
+use App\Http\Controllers\TrackingController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +37,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/commands', [CommandController::class, 'store'])->name('commands.store');
             Route::get('/commands/{command}', [CommandController::class, 'show'])->name('commands.show');
             Route::post('/commands/{command}/cancel', [CommandController::class, 'cancel'])->name('commands.cancel');
+            Route::get('/commands/{command}/track', [TrackingController::class, 'show'])->name('commands.track');
         });
     });
     
@@ -50,6 +52,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/commands/{command}/complete', [CommandController::class, 'completeDelivery'])->name('commands.complete');
             Route::post('/commands/{command}/cancel', [CommandController::class, 'cancel'])->name('commands.cancel');
             Route::post('/commands/{command}/reset', [CommandController::class, 'reset'])->name('commands.reset');
+            Route::get('/commands/{command}/track', [TrackingController::class, 'show'])->name('commands.track');
+            Route::post('/commands/{command}/update-location', [TrackingController::class, 'updateLivreurLocation'])->name('commands.update-location');
         });
     });
 });
