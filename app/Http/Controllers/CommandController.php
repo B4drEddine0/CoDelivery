@@ -155,9 +155,9 @@ class CommandController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isLivreur() || $command->livreur_id != $user->id) {
+        if (!$user->isLivreur() || $command->livreur_id !== $user->id) {
             return redirect()->route('dashboard')
-                ->with('error', 'Vous n\'êtes pas autorisé à modifier cette commande.');
+                ->with('error', 'Vous n\'êtes pas autorisé à effectuer cette action.');
         }
         
         if ($command->status !== 'in_progress') {
@@ -172,6 +172,32 @@ class CommandController extends Controller
         
         return redirect()->route('livreur.dashboard')
             ->with('success', 'Commande livrée avec succès!');
+    }
+
+    
+    public function reset(Command $command)
+    {
+        $user = Auth::user();
+        
+        if (!$user->isLivreur() || $command->livreur_id !== $user->id) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Vous n\'êtes pas autorisé à effectuer cette action.');
+        }
+        
+        if ($command->status !== 'accepted' && $command->status !== 'in_progress') {
+            return redirect()->route('livreur.commands')
+                ->with('error', 'Seules les commandes acceptées ou en cours peuvent être réinitialisées.');
+        }
+        
+        $command->update([
+            'status' => 'pending',
+            'livreur_id' => null,
+            'accepted_at' => null,
+            'started_at' => null,
+        ]);
+        
+        return redirect()->route('livreur.commands')
+            ->with('success', 'La commande a été réinitialisée avec succès et est à nouveau disponible.');
     }
 
     

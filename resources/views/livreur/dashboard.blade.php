@@ -69,7 +69,6 @@
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('livreur.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Mes livraisons</a>
                     <a href="{{ route('livreur.commands') }}" class="text-white hover:text-orange-300 transition-colors">Commandes</a>
-                    <a href="#" class="text-white hover:text-orange-300 transition-colors">Aide</a>
                     
                     <!-- User Profile -->
                     <div class="relative">
@@ -121,9 +120,6 @@
                             <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                             <span class="text-sm font-medium">En ligne</span>
                         </div>
-                        <button class="text-sm bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors">
-                            Passer hors ligne
-                        </button>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -142,7 +138,15 @@
         <!-- Current Delivery -->
         @if($currentCommand)
         <div class="mb-8 bg-white rounded-xl p-6 shadow-sm border-l-4 {{ $currentCommand->status == 'accepted' ? 'border-blue-500' : 'border-green-500' }}">
-            <h2 class="text-xl font-semibold mb-4">Livraison en cours</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Livraison en cours</h2>
+                <form action="{{ route('livreur.commands.reset', $currentCommand) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="text-gray-500 hover:text-gray-700" title="Réinitialiser cette commande">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </form>
+            </div>
             <div class="flex flex-col md:flex-row md:items-center justify-between">
                 <div class="mb-4 md:mb-0">
                     <div class="flex items-center mb-2">
@@ -206,7 +210,7 @@
                         </button>
                     </form>
                     @endif
-                    <a href="tel:+33600000000" class="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors">
+                    <a href="tel:{{ $currentCommand->client->phone }}" class="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors">
                         <i class="fa-solid fa-phone"></i>
                         <span>Contacter le client</span>
                     </a>

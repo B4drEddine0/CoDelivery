@@ -71,7 +71,7 @@
     <main class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <!-- Back Button -->
         <div class="mb-6">
-            <a href="{{ route('client.dashboard') }}" class="inline-flex items-center text-gray-600 hover:text-orange-600">
+            <a href="javascript:history.back()" class="inline-flex items-center text-gray-600 hover:text-orange-600">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
@@ -209,7 +209,7 @@
                 @endif
                 
                 <!-- Actions -->
-                @if($command->status == 'pending')
+                @if($command->status == 'pending' && auth()->user()->role == 'client')
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <h2 class="text-lg font-semibold mb-4">Actions</h2>
                     <form action="{{ route('client.commands.cancel', $command->id) }}" method="POST" class="inline">

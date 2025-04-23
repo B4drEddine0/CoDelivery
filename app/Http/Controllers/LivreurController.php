@@ -16,9 +16,10 @@ class LivreurController extends Controller
     {
         $user = Auth::user();
         
-        // Get the current active command (in progress or accepted)
+        // Get the current active command (in progress or accepted) with client information
         $currentCommand = $user->livreurCommands()
             ->whereIn('status', ['accepted', 'in_progress'])
+            ->with('client')
             ->latest()
             ->first();
         

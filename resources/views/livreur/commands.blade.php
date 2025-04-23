@@ -76,10 +76,6 @@
                             <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
                                 <span class="font-semibold text-sm">{{ substr(Auth::user()->first_name, 0, 1) }}{{ substr(Auth::user()->last_name, 0, 1) }}</span>
                             </div>
-                            <span>{{ Auth::user()->full_name }}</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
                         </button>
                     </div>
                 </div>
@@ -224,12 +220,20 @@
                             
                             <div class="space-x-2">
                                 @if($command->status == 'accepted')
-                                <form action="{{ route('livreur.commands.start', $command) }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
-                                        Démarrer
-                                    </button>
-                                </form>
+                                <div class="flex space-x-2">
+                                    <form action="{{ route('livreur.commands.start', $command) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+                                            Démarrer
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('livreur.commands.reset', $command) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+                                            Réinitialiser
+                                        </button>
+                                    </form>
+                                </div>
                                 @elseif($command->status == 'in_progress')
                                 <form action="{{ route('livreur.commands.complete', $command) }}" method="POST" class="inline">
                                     @csrf
@@ -248,76 +252,91 @@
         @endif
         
         <!-- Available Orders Section -->
-        <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Commandes disponibles ({{ $availableCommands->count() }})</h2>
+        <div class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Commandes disponibles <span class="text-orange-600">({{ $availableCommands->count() }})</span></h2>
+                
+                <!-- View toggle buttons (optional) -->
+                <div class="hidden sm:flex space-x-2 bg-gray-100 p-1 rounded-lg">
+                    <button class="bg-white text-gray-700 px-3 py-1 rounded-md shadow-sm">
+                        <i class="fa-solid fa-grip text-orange-600 mr-1"></i> Grille
+                    </button>
+                    <button class="text-gray-600 px-3 py-1 rounded-md hover:bg-gray-50">
+                        <i class="fa-solid fa-list text-gray-400 mr-1"></i> Liste
+                    </button>
+                </div>
+            </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($availableCommands as $command)
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $command->priority == 'high' ? 'border-red-500' : 'border-orange-500' }}">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $command->priority == 'high' ? 'border-red-500' : 'border-orange-500' }} hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
                     <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
+                        <!-- Command Header -->
+                        <div class="flex justify-between items-start mb-5">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                                <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3 shadow-sm">
                                     @if($command->service_type == 'restaurant')
-                                    <i class="fa-solid fa-utensils text-orange-600"></i>
+                                    <i class="fa-solid fa-utensils text-orange-600 text-lg"></i>
                                     @elseif($command->service_type == 'pharmacy')
-                                    <i class="fa-solid fa-prescription-bottle-medical text-orange-600"></i>
+                                    <i class="fa-solid fa-prescription-bottle-medical text-orange-600 text-lg"></i>
                                     @elseif($command->service_type == 'market')
-                                    <i class="fa-solid fa-shopping-basket text-orange-600"></i>
+                                    <i class="fa-solid fa-shopping-basket text-orange-600 text-lg"></i>
                                     @else
-                                    <i class="fa-solid fa-box text-orange-600"></i>
+                                    <i class="fa-solid fa-box text-orange-600 text-lg"></i>
                                     @endif
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-800">{{ $command->title }}</h3>
+                                    <h3 class="font-semibold text-gray-800 text-lg">{{ $command->title }}</h3>
                                     <p class="text-sm text-gray-500">{{ $command->establishment_name }}</p>
                                 </div>
                             </div>
-                            <span class="px-2 py-1 text-xs font-medium rounded-full {{ $command->priority == 'high' ? 'bg-red-100 text-red-800' : ($command->priority == 'medium' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800') }}">
+                            <span class="px-3 py-1 text-xs font-medium rounded-full {{ $command->priority == 'high' ? 'bg-red-100 text-red-800' : ($command->priority == 'medium' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800') }}">
                                 {{ $command->priority == 'high' ? 'Urgent' : ($command->priority == 'medium' ? 'Standard' : 'Basse') }}
                             </span>
                         </div>
                         
-                        <div class="space-y-3 mb-4">
+                        <!-- Divider -->
+                        <div class="border-t border-gray-100 -mx-6 mb-5"></div>
+                        
+                        <!-- Command Details -->
+                        <div class="space-y-4 mb-5">
                             <div class="flex items-start">
-                                <i class="fa-solid fa-location-dot text-gray-400 mt-1 mr-2"></i>
+                                <div class="bg-orange-50 p-2 rounded-lg mr-3">
+                                    <i class="fa-solid fa-location-dot text-orange-500"></i>
+                                </div>
                                 <div>
-                                    <p class="text-xs text-gray-500">Adresse de retrait:</p>
-                                    <p class="text-sm text-gray-700">{{ $command->pickup_address }}</p>
+                                    <p class="text-sm font-medium text-gray-700">Adresse de retrait</p>
+                                    <p class="text-sm text-gray-600 line-clamp-2">{{ $command->pickup_address }}</p>
                                 </div>
                             </div>
+                            
                             <div class="flex items-start">
-                                <i class="fa-solid fa-location-dot text-orange-500 mt-1 mr-2"></i>
+                                <div class="bg-orange-50 p-2 rounded-lg mr-3">
+                                    <i class="fa-solid fa-map-pin text-orange-500"></i>
+                                </div>
                                 <div>
-                                    <p class="text-xs text-gray-500">Adresse de livraison:</p>
-                                    <p class="text-sm text-gray-700">{{ $command->delivery_address }}</p>
+                                    <p class="text-sm font-medium text-gray-700">Adresse de livraison</p>
+                                    <p class="text-sm text-gray-600 line-clamp-2">{{ $command->delivery_address }}</p>
                                 </div>
                             </div>
                         </div>
                         
+                        <!-- Divider -->
+                        <div class="border-t border-gray-100 -mx-6 mb-5"></div>
+                        
+                        <!-- Command Footer -->
                         <div class="flex justify-between items-center">
                             <div>
                                 <p class="text-sm text-gray-500">Prix de livraison</p>
-                                <p class="font-semibold text-gray-800">{{ number_format($command->price, 2) }} DH</p>
+                                <p class="font-bold text-gray-800 text-lg">{{ number_format($command->price, 2) }} <span class="text-sm font-normal">DH</span></p>
                             </div>
                             
-                            <div class="space-x-2">
-                                <a href="{{ route('livreur.commands.show', $command) }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-3 rounded-lg text-sm transition-colors inline-block">
-                                    <i class="fa-solid fa-circle-info mr-1"></i> Détails
-                                </a>
-                                @if($canAcceptCommands)
-                                <form action="{{ route('livreur.commands.accept', $command) }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
-                                        Accepter
-                                    </button>
-                                </form>
-                                @else
-                                <button type="button" class="bg-gray-400 text-white font-medium py-2 px-4 rounded-lg text-sm cursor-not-allowed" title="Vous avez déjà une commande en cours. Veuillez la terminer avant d'en accepter une nouvelle.">
-                                    Accepter
+                            <form action="{{ route('livreur.accept-command', $command->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2.5 px-5 rounded-lg transition-colors shadow-sm hover:shadow flex items-center">
+                                    <i class="fa-solid fa-check mr-1.5"></i> Accepter
                                 </button>
-                                @endif
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>

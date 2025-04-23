@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/commands/{command}/start', [CommandController::class, 'startDelivery'])->name('commands.start');
             Route::post('/commands/{command}/complete', [CommandController::class, 'completeDelivery'])->name('commands.complete');
             Route::post('/commands/{command}/cancel', [CommandController::class, 'cancel'])->name('commands.cancel');
+            Route::post('/commands/{command}/reset', [CommandController::class, 'reset'])->name('commands.reset');
         });
     });
 });
