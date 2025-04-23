@@ -107,6 +107,16 @@ class CommandController extends Controller
                 ->with('error', 'Cette commande a déjà été prise en charge ou n\'est plus disponible.');
         }
         
+        // Check if the livreur already has an active command
+        $activeCommand = $user->livreurCommands()
+            ->whereIn('status', ['accepted', 'in_progress'])
+            ->first();
+            
+        if ($activeCommand) {
+            return redirect()->route('livreur.commands')
+                ->with('error', 'Vous avez déjà une commande en cours. Veuillez la terminer avant d\'en accepter une nouvelle.');
+        }
+        
         $command->update([
             'livreur_id' => $user->id,
             'status' => 'accepted',

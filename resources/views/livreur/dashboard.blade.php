@@ -75,9 +75,9 @@
                     <div class="relative">
                         <button class="flex items-center space-x-2 focus:outline-none">
                             <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
-                                <span class="font-semibold text-sm">ML</span>
+                                <span class="font-semibold text-sm">{{ substr(Auth::user()->first_name, 0, 1) }}{{ substr(Auth::user()->last_name, 0, 1) }}</span>
                             </div>
-                            <span>Marc Lambert</span>
+                            <span>{{ Auth::user()->full_name }}</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
@@ -99,11 +99,23 @@
     
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+        @endif
+        
         <!-- Status and Earnings Banner -->
         <div class="mb-8 bg-gradient-to-r from-orange-600 to-orange-800 rounded-2xl p-8 text-white">
             <div class="md:flex items-center justify-between">
                 <div class="mb-6 md:mb-0">
-                    <h1 class="text-2xl font-bold mb-2">Bonjour, Marc!</h1>
+                    <h1 class="text-2xl font-bold mb-2">Bonjour, {{ Auth::user()->first_name }}!</h1>
                     <div class="flex items-center space-x-3">
                         <div class="bg-green-500/20 px-3 py-1 rounded-full flex items-center">
                             <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
@@ -117,28 +129,37 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                         <p class="text-sm text-white/70 mb-1">Gains aujourd'hui</p>
-                        <p class="text-2xl font-bold">€42,50</p>
+                        <p class="text-2xl font-bold">{{ number_format($todayEarnings, 2) }} €</p>
                     </div>
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                         <p class="text-sm text-white/70 mb-1">Livraisons</p>
-                        <p class="text-2xl font-bold">7</p>
+                        <p class="text-2xl font-bold">{{ $todayDeliveries }}</p>
                     </div>
                 </div>
             </div>
         </div>
         
         <!-- Current Delivery -->
-        <div class="mb-8 bg-white rounded-xl p-6 shadow-sm border-l-4 border-green-500">
+        @if($currentCommand)
+        <div class="mb-8 bg-white rounded-xl p-6 shadow-sm border-l-4 {{ $currentCommand->status == 'accepted' ? 'border-blue-500' : 'border-green-500' }}">
             <h2 class="text-xl font-semibold mb-4">Livraison en cours</h2>
             <div class="flex flex-col md:flex-row md:items-center justify-between">
                 <div class="mb-4 md:mb-0">
                     <div class="flex items-center mb-2">
                         <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                            @if($currentCommand->service_type == 'restaurant')
                             <i class="fa-solid fa-utensils text-orange-600"></i>
+                            @elseif($currentCommand->service_type == 'pharmacy')
+                            <i class="fa-solid fa-prescription-bottle-medical text-orange-600"></i>
+                            @elseif($currentCommand->service_type == 'market')
+                            <i class="fa-solid fa-shopping-basket text-orange-600"></i>
+                            @else
+                            <i class="fa-solid fa-box text-orange-600"></i>
+                            @endif
                         </div>
                         <div>
-                            <p class="font-medium">Restaurant - <span class="font-semibold">Burger King</span></p>
-                            <p class="text-sm text-gray-500">Commande #BK-2345</p>
+                            <p class="font-medium">{{ ucfirst($currentCommand->service_type) }} - <span class="font-semibold">{{ $currentCommand->establishment_name }}</span></p>
+                            <p class="text-sm text-gray-500">Commande #{{ $currentCommand->id }}</p>
                         </div>
                     </div>
                     
@@ -148,32 +169,47 @@
                             <i class="fa-solid fa-check text-green-600"></i>
                         </div>
                         <div class="flex-1 h-1 bg-gray-200 relative">
-                            <div class="absolute inset-0 bg-green-500" style="width: 66%;"></div>
+                            <div class="absolute inset-0 bg-green-500" style="width: 100%;"></div>
                         </div>
-                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-truck text-orange-600"></i>
+                        <div class="w-8 h-8 {{ $currentCommand->status == 'in_progress' ? 'bg-orange-100' : 'bg-gray-100' }} rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-truck {{ $currentCommand->status == 'in_progress' ? 'text-orange-600' : 'text-gray-400' }}"></i>
                         </div>
-                        <div class="flex-1 h-1 bg-gray-200"></div>
+                        <div class="flex-1 h-1 bg-gray-200 relative">
+                            <div class="absolute inset-0 bg-green-500" style="width: {{ $currentCommand->status == 'in_progress' ? '50%' : '0%' }};"></div>
+                        </div>
                         <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                             <i class="fa-solid fa-flag-checkered text-gray-400"></i>
                         </div>
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 mt-1 px-2">
-                        <span>Récupéré</span>
+                        <span>Acceptée</span>
                         <span>En livraison</span>
-                        <span>Livré</span>
+                        <span>Livrée</span>
                     </div>
                 </div>
                 
                 <div class="flex flex-col space-y-3">
-                    <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors">
-                        <i class="fa-solid fa-check"></i>
-                        <span>Marquer comme livré</span>
-                    </button>
-                    <button class="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors">
+                    @if($currentCommand->status == 'accepted')
+                    <form action="{{ route('livreur.commands.start', $currentCommand) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors w-full">
+                            <i class="fa-solid fa-truck"></i>
+                            <span>Démarrer la livraison</span>
+                        </button>
+                    </form>
+                    @elseif($currentCommand->status == 'in_progress')
+                    <form action="{{ route('livreur.commands.complete', $currentCommand) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors w-full">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Marquer comme livré</span>
+                        </button>
+                    </form>
+                    @endif
+                    <a href="tel:+33600000000" class="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-50 transition-colors">
                         <i class="fa-solid fa-phone"></i>
                         <span>Contacter le client</span>
-                    </button>
+                    </a>
                 </div>
             </div>
             
@@ -184,10 +220,9 @@
                         <i class="fa-solid fa-location-dot text-orange-500 mr-2"></i>
                         Adresse de livraison
                     </h3>
-                    <p class="text-gray-700">123 Rue de Paris, 75001 Paris</p>
-                    <p class="text-gray-500 text-sm mt-1">Appartement 4B, 2ème étage, code: 4567</p>
+                    <p class="text-gray-700">{{ $currentCommand->delivery_address }}</p>
                     <div class="mt-3">
-                        <a href="#" class="text-orange-600 hover:text-orange-700 text-sm flex items-center">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($currentCommand->delivery_address) }}" target="_blank" class="text-orange-600 hover:text-orange-700 text-sm flex items-center">
                             <i class="fa-solid fa-map-location-dot mr-1"></i>
                             Voir sur la carte
                         </a>
@@ -199,27 +234,38 @@
                         <i class="fa-solid fa-receipt text-orange-500 mr-2"></i>
                         Détails de la commande
                     </h3>
-                    <ul class="space-y-2 text-gray-700">
-                        <li class="flex justify-between">
-                            <span>1x Whopper Menu</span>
-                            <span>€9.90</span>
-                        </li>
-                        <li class="flex justify-between">
-                            <span>1x King Fusion Oreo</span>
-                            <span>€3.50</span>
-                        </li>
-                        <li class="flex justify-between">
-                            <span>1x Nuggets x9</span>
-                            <span>€5.95</span>
-                        </li>
-                        <li class="flex justify-between font-medium pt-2 border-t border-gray-200 mt-2">
-                            <span>Total</span>
-                            <span>€19.35</span>
-                        </li>
-                    </ul>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">{{ $currentCommand->title }}</span>
+                        </div>
+                        @if($currentCommand->description)
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">{{ $currentCommand->description }}</span>
+                        </div>
+                        @endif
+                        <div class="flex justify-between text-sm font-medium mt-2 pt-2 border-t border-gray-200">
+                            <span>Prix de livraison</span>
+                            <span>{{ number_format($currentCommand->price, 2) }} €</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        @else
+        <div class="mb-8 bg-white rounded-xl p-6 shadow-sm">
+            <div class="text-center py-8">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-clipboard-list text-gray-400 text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-semibold mb-2">Aucune livraison en cours</h2>
+                <p class="text-gray-600 mb-4">Vous n'avez pas de livraison en cours pour le moment.</p>
+                <a href="{{ route('livreur.commands') }}" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg inline-flex items-center justify-center space-x-2 transition-colors">
+                    <i class="fa-solid fa-search"></i>
+                    <span>Voir les commandes disponibles</span>
+                </a>
+            </div>
+        </div>
+        @endif
         
    
         <!-- Recent Deliveries -->
@@ -237,124 +283,73 @@
                                     Commande
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Client
+                                    Type
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Distance
+                                    Adresse
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Paiement
+                                    Montant
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Statut
+                                    Actions
                                 </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <!-- Delivery 1 -->
+                            @forelse($recentlyCompletedCommands as $command)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    Aujourd'hui, 14:25
+                                    {{ $command->delivered_at ? $command->delivered_at->format('d/m/Y H:i') : 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-                                            <i class="fa-solid fa-utensils text-orange-600 text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900">McDonald's</div>
-                                            <div class="text-xs text-gray-500">#MD-1234</div>
+                                        <div class="ml-0">
+                                            <div class="text-sm font-medium text-gray-900">#{{ $command->id }} - {{ $command->title }}</div>
+                                            <div class="text-xs text-gray-500">{{ $command->establishment_name }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">Sophie Martin</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    2.4 km
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                                    €6.50
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Livré
-                                    </span>
-                                </td>
-                            </tr>
-                            
-                            <!-- Delivery 2 -->
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    Aujourd'hui, 12:10
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-                                            <i class="fa-solid fa-prescription-bottle-medical text-orange-600 text-sm"></i>
+                                        <div class="flex-shrink-0 h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center mr-2">
+                                            @if($command->service_type == 'restaurant')
+                                            <i class="fa-solid fa-utensils text-orange-600 text-xs"></i>
+                                            @elseif($command->service_type == 'pharmacy')
+                                            <i class="fa-solid fa-prescription-bottle-medical text-orange-600 text-xs"></i>
+                                            @elseif($command->service_type == 'market')
+                                            <i class="fa-solid fa-shopping-basket text-orange-600 text-xs"></i>
+                                            @else
+                                            <i class="fa-solid fa-box text-orange-600 text-xs"></i>
+                                            @endif
                                         </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900">Pharmacie du Centre</div>
-                                            <div class="text-xs text-gray-500">#PC-7890</div>
-                                        </div>
+                                        <span class="text-sm text-gray-900">{{ ucfirst($command->service_type) }}</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">Thomas Dubois</div>
-                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    3.7 km
+                                    {{ Str::limit($command->delivery_address, 30) }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                                    €8.75
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    {{ number_format($command->price, 2) }} €
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Livré
-                                    </span>
+                                    <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($command->delivery_address) }}" target="_blank" class="text-orange-600 hover:text-orange-700 text-sm">
+                                        <i class="fa-solid fa-map-location-dot"></i>
+                                    </a>
                                 </td>
                             </tr>
-                            
-                            <!-- Delivery 3 -->
+                            @empty
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    Aujourd'hui, 10:45
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-                                            <svg class="w-4 h-4 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900">Monoprix</div>
-                                            <div class="text-xs text-gray-500">#MP-4567</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">Émilie Petit</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    1.8 km
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                                    €7.25
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Livré
-                                    </span>
+                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    Aucune livraison récente à afficher
                                 </td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-                <div class="bg-gray-50 px-6 py-3 flex justify-center">
-                    <button class="text-orange-600 hover:text-orange-700 hover:underline text-sm font-medium">
-                        Voir tout l'historique
-                    </button>
+                <div class="bg-gray-50 px-6 py-3">
+                    {{ $recentlyCompletedCommands->links() }}
                 </div>
             </div>
         </div>

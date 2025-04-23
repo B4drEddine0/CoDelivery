@@ -5,31 +5,51 @@ namespace App\Http\Controllers;
 use App\Models\Command;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LivreurController extends Controller
 {
     /**
      * Display the livreur dashboard.
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $user = Auth::user();
         
-        $activeCommands = $user->livreurCommands()
+        // Get the current active command (in progress or accepted)
+        $currentCommand = $user->livreurCommands()
             ->whereIn('status', ['accepted', 'in_progress'])
             ->latest()
-            ->take(3)
-            ->get();
+            ->first();
         
+        // Get recently completed commands with pagination
         $recentlyCompletedCommands = $user->livreurCommands()
             ->where('status', 'delivered')
             ->latest()
-            ->take(3)
-            ->get();
+            ->paginate(5);
+        
+        // Calculate today's earnings
+        $todayEarnings = $user->livreurCommands()
+            ->where('status', 'delivered')
+            ->whereDate('delivered_at', today())
+            ->sum('price');
+        
+        // Count today's deliveries
+        $todayDeliveries = $user->livreurCommands()
+            ->where('status', 'delivered')
+            ->whereDate('delivered_at', today())
+            ->count();
+        
+        // Check if the livreur can accept new commands
+        $canAcceptCommands = !$currentCommand || 
+            ($currentCommand->status !== 'accepted' && $currentCommand->status !== 'in_progress');
         
         return view('livreur.dashboard', [
-            'activeCommands' => $activeCommands,
-            'recentlyCompletedCommands' => $recentlyCompletedCommands
+            'currentCommand' => $currentCommand,
+            'recentlyCompletedCommands' => $recentlyCompletedCommands,
+            'todayEarnings' => $todayEarnings,
+            'todayDeliveries' => $todayDeliveries,
+            'canAcceptCommands' => $canAcceptCommands
         ]);
     }
     
@@ -45,32 +65,45 @@ class LivreurController extends Controller
             ->latest()
             ->get();
         
-        // Get available commands (pending status)
-        $query = Command::where('status', 'pending')
-            ->whereNull('livreur_id')
-            ->latest();
+        // Check if the livreur has an active command (in progress or accepted)
+        $activeCommand = $user->livreurCommands()
+            ->whereIn('status', ['accepted', 'in_progress'])
+            ->latest()
+            ->first();
         
-        // Filter by date if provided
-        if ($request->filled('date')) {
-            $date = $request->date;
-            $query->whereDate('created_at', $date);
+        // Get available commands (pending status) only if the livreur doesn't have an active command
+        $availableCommands = collect([]);
+        $canAcceptCommands = !$activeCommand;
+        
+        if ($canAcceptCommands) {
+            $query = Command::where('status', 'pending')
+                ->whereNull('livreur_id')
+                ->latest();
+            
+            // Filter by date if provided
+            if ($request->filled('date')) {
+                $date = $request->date;
+                $query->whereDate('created_at', $date);
+            }
+            
+            // Filter by service type if provided
+            if ($request->filled('service_type')) {
+                $query->where('service_type', $request->service_type);
+            }
+            
+            // Filter by priority if provided
+            if ($request->filled('priority')) {
+                $query->where('priority', $request->priority);
+            }
+            
+            $availableCommands = $query->get();
         }
-        
-        // Filter by service type if provided
-        if ($request->filled('service_type')) {
-            $query->where('service_type', $request->service_type);
-        }
-        
-        // Filter by priority if provided
-        if ($request->filled('priority')) {
-            $query->where('priority', $request->priority);
-        }
-        
-        $availableCommands = $query->get();
         
         return view('livreur.commands', [
             'myCommands' => $myCommands,
-            'availableCommands' => $availableCommands
+            'availableCommands' => $availableCommands,
+            'canAcceptCommands' => $canAcceptCommands,
+            'activeCommand' => $activeCommand
         ]);
     }
 }
