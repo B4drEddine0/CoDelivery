@@ -43,6 +43,50 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        
+        /* List view styles */
+        .command-grid.list-view {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .command-grid.list-view .command-card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        
+        .command-grid.list-view .command-card-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .command-grid.list-view .command-header {
+            width: 25%;
+            margin-bottom: 0 !important;
+            padding-right: 1rem;
+        }
+        
+        .command-grid.list-view .command-details {
+            width: 50%;
+            margin-bottom: 0 !important;
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .command-grid.list-view .command-details > div {
+            flex: 1;
+        }
+        
+        .command-grid.list-view .command-footer {
+            width: 25%;
+            margin-left: auto;
+        }
+        
+        .command-grid.list-view .command-divider {
+            display: none;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -256,23 +300,23 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Commandes disponibles <span class="text-orange-600">({{ $availableCommands->count() }})</span></h2>
                 
-                <!-- View toggle buttons (optional) -->
+                <!-- View toggle buttons -->
                 <div class="hidden sm:flex space-x-2 bg-gray-100 p-1 rounded-lg">
-                    <button class="bg-white text-gray-700 px-3 py-1 rounded-md shadow-sm">
+                    <button id="grid-view-btn" class="view-toggle-btn bg-white text-gray-700 px-3 py-1 rounded-md shadow-sm">
                         <i class="fa-solid fa-grip text-orange-600 mr-1"></i> Grille
                     </button>
-                    <button class="text-gray-600 px-3 py-1 rounded-md hover:bg-gray-50">
+                    <button id="list-view-btn" class="view-toggle-btn text-gray-600 px-3 py-1 rounded-md hover:bg-gray-50">
                         <i class="fa-solid fa-list text-gray-400 mr-1"></i> Liste
                     </button>
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="command-grid" class="command-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($availableCommands as $command)
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $command->priority == 'high' ? 'border-red-500' : 'border-orange-500' }} hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
-                    <div class="p-6">
+                <div class="command-card bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $command->priority == 'high' ? 'border-red-500' : 'border-orange-500' }} hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
+                    <div class="command-card-content p-6">
                         <!-- Command Header -->
-                        <div class="flex justify-between items-start mb-5">
+                        <div class="command-header flex justify-between items-start mb-5">
                             <div class="flex items-center">
                                 <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3 shadow-sm">
                                     @if($command->service_type == 'restaurant')
@@ -296,10 +340,10 @@
                         </div>
                         
                         <!-- Divider -->
-                        <div class="border-t border-gray-100 -mx-6 mb-5"></div>
+                        <div class="command-divider border-t border-gray-100 -mx-6 mb-5"></div>
                         
                         <!-- Command Details -->
-                        <div class="space-y-4 mb-5">
+                        <div class="command-details space-y-4 mb-5">
                             <div class="flex items-start">
                                 <div class="bg-orange-50 p-2 rounded-lg mr-3">
                                     <i class="fa-solid fa-location-dot text-orange-500"></i>
@@ -322,21 +366,32 @@
                         </div>
                         
                         <!-- Divider -->
-                        <div class="border-t border-gray-100 -mx-6 mb-5"></div>
+                        <div class="command-divider border-t border-gray-100 -mx-6 mb-5"></div>
                         
                         <!-- Command Footer -->
-                        <div class="flex justify-between items-center">
+                        <div class="command-footer flex justify-between items-center">
                             <div>
                                 <p class="text-sm text-gray-500">Prix de livraison</p>
                                 <p class="font-bold text-gray-800 text-lg">{{ number_format($command->price, 2) }} <span class="text-sm font-normal">DH</span></p>
                             </div>
                             
-                            <form action="{{ route('livreur.accept-command', $command->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2.5 px-5 rounded-lg transition-colors shadow-sm hover:shadow flex items-center">
+                            <div class="space-x-2">
+                                <a href="{{ route('livreur.commands.show', $command) }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-3 rounded-lg text-sm transition-colors inline-flex items-center">
+                                    <i class="fa-solid fa-circle-info mr-1"></i> Détails
+                                </a>
+                                @if(isset($canAcceptCommands) && !$canAcceptCommands)
+                                <button type="button" class="bg-gray-400 text-white font-medium py-2 px-4 rounded-lg text-sm cursor-not-allowed inline-flex items-center" title="Vous avez déjà une commande en cours. Veuillez la terminer avant d'en accepter une nouvelle.">
                                     <i class="fa-solid fa-check mr-1.5"></i> Accepter
                                 </button>
-                            </form>
+                                @else
+                                <form action="{{ route('livreur.commands.accept', $command) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors shadow-sm hover:shadow inline-flex items-center">
+                                        <i class="fa-solid fa-check mr-1.5"></i> Accepter
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -394,5 +449,69 @@
             <i class="fa-solid fa-headset text-xl"></i>
         </button>
     </div>
+    <!-- View Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gridViewBtn = document.getElementById('grid-view-btn');
+            const listViewBtn = document.getElementById('list-view-btn');
+            const commandGrid = document.getElementById('command-grid');
+            
+            // Function to save view preference to localStorage
+            function saveViewPreference(view) {
+                localStorage.setItem('commandViewPreference', view);
+            }
+            
+            // Function to load view preference from localStorage
+            function loadViewPreference() {
+                return localStorage.getItem('commandViewPreference') || 'grid';
+            }
+            
+            // Function to set grid view
+            function setGridView() {
+                commandGrid.classList.remove('list-view');
+                gridViewBtn.classList.add('bg-white', 'text-gray-700', 'shadow-sm');
+                gridViewBtn.classList.remove('text-gray-600', 'hover:bg-gray-50');
+                listViewBtn.classList.remove('bg-white', 'text-gray-700', 'shadow-sm');
+                listViewBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
+                
+                // Update icons
+                gridViewBtn.querySelector('i').classList.add('text-orange-600');
+                gridViewBtn.querySelector('i').classList.remove('text-gray-400');
+                listViewBtn.querySelector('i').classList.remove('text-orange-600');
+                listViewBtn.querySelector('i').classList.add('text-gray-400');
+                
+                saveViewPreference('grid');
+            }
+            
+            // Function to set list view
+            function setListView() {
+                commandGrid.classList.add('list-view');
+                listViewBtn.classList.add('bg-white', 'text-gray-700', 'shadow-sm');
+                listViewBtn.classList.remove('text-gray-600', 'hover:bg-gray-50');
+                gridViewBtn.classList.remove('bg-white', 'text-gray-700', 'shadow-sm');
+                gridViewBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
+                
+                // Update icons
+                listViewBtn.querySelector('i').classList.add('text-orange-600');
+                listViewBtn.querySelector('i').classList.remove('text-gray-400');
+                gridViewBtn.querySelector('i').classList.remove('text-orange-600');
+                gridViewBtn.querySelector('i').classList.add('text-gray-400');
+                
+                saveViewPreference('list');
+            }
+            
+            // Set initial view based on saved preference
+            const initialView = loadViewPreference();
+            if (initialView === 'list') {
+                setListView();
+            } else {
+                setGridView();
+            }
+            
+            // Add event listeners to buttons
+            gridViewBtn.addEventListener('click', setGridView);
+            listViewBtn.addEventListener('click', setListView);
+        });
+    </script>
 </body>
 </html>
