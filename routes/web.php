@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommandController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\LivreurController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,9 +41,8 @@ Route::middleware('auth')->group(function () {
     
     Route::prefix('livreur')->name('livreur.')->group(function () {
         Route::middleware(\App\Http\Middleware\LivreurMiddleware::class)->group(function () {
-            Route::get('/dashboard', function () {
-                return view('livreur.dashboard');
-            })->name('dashboard');
+            Route::get('/dashboard', [LivreurController::class, 'dashboard'])->name('dashboard');
+            Route::get('/commands', [LivreurController::class, 'commands'])->name('commands');
             
             Route::get('/commands/{command}', [CommandController::class, 'show'])->name('commands.show');
             Route::post('/commands/{command}/accept', [CommandController::class, 'accept'])->name('commands.accept');
