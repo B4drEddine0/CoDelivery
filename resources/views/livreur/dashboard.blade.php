@@ -129,7 +129,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                         <p class="text-sm text-white/70 mb-1">Gains aujourd'hui</p>
-                        <p class="text-2xl font-bold">{{ number_format($todayEarnings, 2) }} €</p>
+                        <p class="text-2xl font-bold">{{ number_format($todayEarnings, 2) }} DH</p>
                     </div>
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                         <p class="text-sm text-white/70 mb-1">Livraisons</p>
@@ -245,7 +245,7 @@
                         @endif
                         <div class="flex justify-between text-sm font-medium mt-2 pt-2 border-t border-gray-200">
                             <span>Prix de livraison</span>
-                            <span>{{ number_format($currentCommand->price, 2) }} €</span>
+                            <span>{{ number_format($currentCommand->price, 2) }} DH</span>
                         </div>
                     </div>
                 </div>
@@ -330,7 +330,7 @@
                                     {{ Str::limit($command->delivery_address, 30) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    {{ number_format($command->price, 2) }} €
+                                    {{ number_format($command->price, 2) }} DH
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($command->delivery_address) }}" target="_blank" class="text-orange-600 hover:text-orange-700 text-sm">

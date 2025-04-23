@@ -219,7 +219,7 @@
                         <div class="flex justify-between items-center">
                             <div>
                                 <p class="text-sm text-gray-500">Prix de livraison</p>
-                                <p class="font-semibold text-gray-800">{{ number_format($command->price, 2) }} €</p>
+                                <p class="font-semibold text-gray-800">{{ number_format($command->price, 2) }} DH</p>
                             </div>
                             
                             <div class="space-x-2">
@@ -298,19 +298,25 @@
                         <div class="flex justify-between items-center">
                             <div>
                                 <p class="text-sm text-gray-500">Prix de livraison</p>
-                                <p class="font-semibold text-gray-800">{{ number_format($command->price, 2) }} €</p>
+                                <p class="font-semibold text-gray-800">{{ number_format($command->price, 2) }} DH</p>
                             </div>
                             
                             <div class="space-x-2">
                                 <a href="{{ route('livreur.commands.show', $command) }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-3 rounded-lg text-sm transition-colors inline-block">
                                     <i class="fa-solid fa-circle-info mr-1"></i> Détails
                                 </a>
+                                @if($canAcceptCommands)
                                 <form action="{{ route('livreur.commands.accept', $command) }}" method="POST" class="inline">
                                     @csrf
                                     <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
                                         Accepter
                                     </button>
                                 </form>
+                                @else
+                                <button type="button" class="bg-gray-400 text-white font-medium py-2 px-4 rounded-lg text-sm cursor-not-allowed" title="Vous avez déjà une commande en cours. Veuillez la terminer avant d'en accepter une nouvelle.">
+                                    Accepter
+                                </button>
+                                @endif
                             </div>
                         </div>
                     </div>

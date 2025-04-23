@@ -71,33 +71,31 @@ class LivreurController extends Controller
             ->latest()
             ->first();
         
-        // Get available commands (pending status) only if the livreur doesn't have an active command
-        $availableCommands = collect([]);
+        // Check if the livreur can accept new commands
         $canAcceptCommands = !$activeCommand;
         
-        if ($canAcceptCommands) {
-            $query = Command::where('status', 'pending')
-                ->whereNull('livreur_id')
-                ->latest();
-            
-            // Filter by date if provided
-            if ($request->filled('date')) {
-                $date = $request->date;
-                $query->whereDate('created_at', $date);
-            }
-            
-            // Filter by service type if provided
-            if ($request->filled('service_type')) {
-                $query->where('service_type', $request->service_type);
-            }
-            
-            // Filter by priority if provided
-            if ($request->filled('priority')) {
-                $query->where('priority', $request->priority);
-            }
-            
-            $availableCommands = $query->get();
+        // Get available commands (pending status) - always show them regardless of active command
+        $query = Command::where('status', 'pending')
+            ->whereNull('livreur_id')
+            ->latest();
+        
+        // Filter by date if provided
+        if ($request->filled('date')) {
+            $date = $request->date;
+            $query->whereDate('created_at', $date);
         }
+        
+        // Filter by service type if provided
+        if ($request->filled('service_type')) {
+            $query->where('service_type', $request->service_type);
+        }
+        
+        // Filter by priority if provided
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->priority);
+        }
+        
+        $availableCommands = $query->get();
         
         return view('livreur.commands', [
             'myCommands' => $myCommands,
