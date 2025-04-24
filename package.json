@@ -1,9 +1,9 @@
 {
     "private": true,
-    "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "socket": "node socket-server.js"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
@@ -12,5 +12,29 @@
         "laravel-vite-plugin": "^1.2.0",
         "tailwindcss": "^4.0.0",
         "vite": "^6.2.4"
+    },
+    "name": "codelivery",
+    "version": "1.0.0",
+    "description": "## Contexte et Définition du Projet CoDelivery est une plateforme innovante destinée à simplifier la gestion des commandes dans le domaine de la livraison. Notre objectif est de mettre en relation des clients, qui publient des commandes, et des livreurs, qui les réalisent, en proposant un environnement sécurisé, intuitif, et efficace.",
+    "main": "socket-server.js",
+    "type": "module",
+    "directories": {
+        "test": "tests"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/B4drEddine0/CoDelivery.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/B4drEddine0/CoDelivery/issues"
+    },
+    "homepage": "https://github.com/B4drEddine0/CoDelivery#readme",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^5.1.0",
+        "socket.io": "^4.8.1"
     }
 }

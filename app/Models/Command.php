@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Command extends Model
 {
@@ -99,11 +98,5 @@ class Command extends Model
         return $this->status === 'cancelled';
     }
     
-    /**
-     * Get the location tracking associated with the command.
-     */
-    public function locationTracking(): HasOne
-    {
-        return $this->hasOne(LocationTracking::class);
-    }
+
 }

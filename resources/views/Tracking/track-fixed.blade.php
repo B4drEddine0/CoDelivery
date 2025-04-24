@@ -166,9 +166,11 @@
                 </button>
             </div>
             <div>
+                @if($userRole === 'livreur')
                 <button id="shareLocationBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center gap-2">
                     <i class="fas fa-location-arrow"></i> Partager ma position
                 </button>
+                @endif
             </div>
         </div>
         
@@ -634,7 +636,9 @@
             }
             
             // Add event listener for share location button
-            document.getElementById('shareLocationBtn').addEventListener('click', startLocationSharing);
+            if (isLivreur) {
+                document.getElementById('shareLocationBtn').addEventListener('click', startLocationSharing);
+            }
             
             // Add center map button functionality
             document.getElementById('centerMapBtn').addEventListener('click', () => {

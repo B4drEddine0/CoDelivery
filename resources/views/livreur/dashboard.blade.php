@@ -45,8 +45,46 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Location Permission System -->
+    <script src="/js/location-permission.js"></script>
 </head>
 <body class="bg-gray-50">
+    <!-- Initialize location permission system on page load -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the location permission system
+            if (!window.locationSystem) {
+                window.locationSystem = new LocationPermissionSystem();
+                window.locationSystem.init();
+            }
+            
+            // Listen for location verification event
+            window.addEventListener('locationVerified', function(event) {
+                console.log('Location verified:', event.detail.position, 'City:', event.detail.city);
+                // Store location in localStorage for use in tracking page
+                localStorage.setItem('userLocation', JSON.stringify(event.detail.position));
+                localStorage.setItem('userCity', event.detail.city);
+                localStorage.setItem('locationVerified', 'true');
+                
+                // Send location to server for this user
+                $.ajax({
+                    url: '{{ route("livreur.store-location") }}',
+                    method: 'POST',
+                    data: {
+                        latitude: event.detail.position.lat,
+                        longitude: event.detail.position.lng,
+                        city: event.detail.city,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        console.log('Location stored in database');
+                    }
+                });
+            });
+        });
+    </script>
     <!-- Header -->
     <header class="bg-gradient-to-r from-orange-800 to-orange-950 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
