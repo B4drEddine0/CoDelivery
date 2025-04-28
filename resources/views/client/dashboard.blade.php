@@ -47,45 +47,8 @@
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    
-    <!-- Location Permission System -->
-    <script src="/js/location-permission.js"></script>
 </head>
 <body class="bg-gray-50">
-    <!-- Initialize location permission system on page load -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize the location permission system
-            if (!window.locationSystem) {
-                window.locationSystem = new LocationPermissionSystem();
-                window.locationSystem.init();
-            }
-            
-            // Listen for location verification event
-            window.addEventListener('locationVerified', function(event) {
-                console.log('Location verified:', event.detail.position, 'City:', event.detail.city);
-                // Store location in localStorage for use in tracking page
-                localStorage.setItem('userLocation', JSON.stringify(event.detail.position));
-                localStorage.setItem('userCity', event.detail.city);
-                localStorage.setItem('locationVerified', 'true');
-                
-                // Send location to server for this user
-                $.ajax({
-                    url: '{{ route("client.store-location") }}',
-                    method: 'POST',
-                    data: {
-                        latitude: event.detail.position.lat,
-                        longitude: event.detail.position.lng,
-                        city: event.detail.city,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        console.log('Location stored in database');
-                    }
-                });
-            });
-        });
-    </script>
     <!-- Header -->
     <header class="bg-gradient-to-r from-orange-800 to-orange-950 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -208,7 +171,7 @@
                     <div class="flex flex-col items-center">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
                             <svg class="w-8 h-8 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4"/>
                             </svg>
                         </div>
                         <h3 class="font-medium">Colis</h3>
@@ -242,9 +205,9 @@
                     <a href="{{ route('client.commands.show', $ongoingCommand->id) }}" class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
                         Détails
                     </a>
-                    <button class="bg-orange-100 text-orange-600 px-4 py-2 rounded-lg hover:bg-orange-200">
-                        Suivre
-                    </button>
+                    <a href="{{ route('client.commands.track', $ongoingCommand->id) }}" class="bg-orange-100 text-orange-600 px-4 py-2 rounded-lg hover:bg-orange-200">
+                        <i class="fa-solid fa-location-dot mr-2"></i>Suivre
+                    </a>
                 </div>
             </div>
         </div>
@@ -470,7 +433,7 @@
                     <span class="text-xl font-bold">CoDelivery</span>
                 </div>
                 <div class="text-sm text-gray-400">
-                    © 2025 CoDelivery. Tous droits réservés.
+                    &copy; 2025 CoDelivery. Tous droits réservés.
                 </div>
                 <div class="flex space-x-4 mt-4 md:mt-0">
                     <a href="#" class="text-gray-400 hover:text-orange-500 transition-colors">Aide</a>

@@ -209,15 +209,54 @@
                 @endif
                 
                 <!-- Actions -->
-                @if($command->status == 'pending' && auth()->user()->role == 'client')
+                @if(auth()->user()->role == 'client')
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <h2 class="text-lg font-semibold mb-4">Actions</h2>
-                    <form action="{{ route('client.commands.cancel', $command->id) }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors">
-                            Annuler la commande
-                        </button>
-                    </form>
+                    <div class="flex flex-wrap gap-3">
+                        @if($command->status == 'pending')
+                        <form action="{{ route('client.commands.cancel', $command->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors">
+                                <i class="fa-solid fa-times-circle mr-2"></i>Annuler la commande
+                            </button>
+                        </form>
+                        @endif
+                        
+                        @if(in_array($command->status, ['accepted', 'in_progress']))
+                        <a href="{{ route('client.commands.track', $command->id) }}" class="inline-flex items-center bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors">
+                            <i class="fa-solid fa-location-dot mr-2"></i>Suivre en temps réel
+                        </a>
+                        @endif
+                    </div>
+                </div>
+                @elseif(auth()->user()->role == 'livreur' && $command->livreur_id == auth()->id())
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Actions</h2>
+                    <div class="flex flex-wrap gap-3">
+                        @if($command->status == 'accepted')
+                        <form action="{{ route('livreur.commands.start', $command->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                                <i class="fa-solid fa-truck mr-2"></i>Démarrer la livraison
+                            </button>
+                        </form>
+                        @endif
+                        
+                        @if($command->status == 'in_progress')
+                        <form action="{{ route('livreur.commands.complete', $command->id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                                <i class="fa-solid fa-check-circle mr-2"></i>Marquer comme livrée
+                            </button>
+                        </form>
+                        @endif
+                        
+                        @if(in_array($command->status, ['accepted', 'in_progress']))
+                        <a href="{{ route('livreur.commands.track', $command->id) }}" class="inline-flex items-center bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors">
+                            <i class="fa-solid fa-location-dot mr-2"></i>Suivre en temps réel
+                        </a>
+                        @endif
+                    </div>
                 </div>
                 @endif
             </div>

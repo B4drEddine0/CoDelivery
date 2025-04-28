@@ -6,6 +6,7 @@
     <title>CoDelivery - Nouvelle Commande</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -58,6 +59,27 @@
         @keyframes fadeIn {
             0% { opacity: 0; transform: translateY(10px); }
             100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        #map {
+            width: 100%;
+            height: 250px;
+            border-radius: 0.5rem;
+        }
+        
+        .map-marker {
+            width: 30px;
+            height: 30px;
+            background-color: #ea580c;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+        
+        .mapboxgl-popup-content {
+            padding: 12px;
+            border-radius: 8px;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -204,10 +226,24 @@
                                 </div>
                                 
                                 <div>
-                                    <label for="pickup_address" class="block text-sm font-medium text-gray-700 mb-1">Adresse de ramassage</label>
-                                    <input type="text" id="pickup_address" name="pickup_address" 
-                                           class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                           placeholder="Adresse complète">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sélectionnez un lieu de ramassage sur la carte</label>
+                                    <div id="map" class="mb-3"></div>
+                                    <div class="flex items-center text-sm text-gray-600 mb-2">
+                                        <i class="fas fa-info-circle mr-2 text-orange-500"></i>
+                                        <span>Cliquez sur la carte pour sélectionner le lieu de ramassage</span>
+                                    </div>
+                                    
+                                    <!-- Hidden input that will store the coordinates -->
+                                    <input type="hidden" id="pickup_coordinates" name="pickup_coordinates" value="">
+                                    
+                                    <!-- Hidden input for the original pickup_address field (for compatibility) -->
+                                    <input type="hidden" id="pickup_address" name="pickup_address" value="">
+                                    
+                                    <!-- Display the selected address -->
+                                    <div class="mt-2 p-3 bg-gray-50 rounded-lg">
+                                        <p class="text-sm font-medium mb-1">Adresse sélectionnée:</p>
+                                        <p id="selected_address_display" class="text-sm text-gray-700">Aucune adresse sélectionnée</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -670,16 +706,26 @@
             // Validate current step before proceeding
             if (currentStep === 1 && step > currentStep) {
                 const establishmentName = document.getElementById('establishment_name').value;
+                const pickupCoordinates = document.getElementById('pickup_coordinates').value;
                 const pickupAddress = document.getElementById('pickup_address').value;
                 
-                if (!establishmentName || !pickupAddress) {
-                    alert('Veuillez remplir le nom de l\'établissement et l\'adresse de ramassage avant de continuer.');
+                // Check if the user has selected a location on the map
+                if (!establishmentName) {
+                    alert('Veuillez remplir le nom de l\'établissement avant de continuer.');
                     return;
                 }
                 
-                // Transfer values from step 1 to hidden fields in step 2
-                document.getElementById('establishment_name_hidden').value = document.getElementById('establishment_name').value;
-                document.getElementById('pickup_address_hidden').value = document.getElementById('pickup_address').value;
+                if (!pickupCoordinates || !pickupAddress) {
+                    alert('Veuillez sélectionner un lieu de ramassage sur la carte avant de continuer.');
+                    return;
+                }
+                
+                // Use the selected address for display but store both address and coordinates
+                document.getElementById('establishment_name_hidden').value = establishmentName;
+                document.getElementById('pickup_address_hidden').value = pickupAddress;
+                
+                console.log('Moving to step 2 with pickup address:', pickupAddress);
+                console.log('Pickup coordinates:', pickupCoordinates);
                 
                 // Initialize the total price calculation when entering step 2
                 setTimeout(() => {
@@ -771,6 +817,124 @@
     <footer class="bg-gradient-to-r from-orange-800 to-orange-950 text-white py-8 mt-4">
         <!-- Same footer as other pages -->
     </footer>
+    
+    <!-- Mapbox Script -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <script>
+        // Initialize map when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mapbox token
+            mapboxgl.accessToken = 'pk.eyJ1IjoiYmFkcmVkZGluZTAwIiwiYSI6ImNsdzJ0cDJ1bTBtMnQyaW11NjBxczE3Z2kifQ.ockRcbgDpqVyMLsAv_tMgw';
+            
+            // Nador city center coordinates
+            const nadorCenter = [-2.9287, 35.1698];
+            
+            // Initialize map centered on Nador
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v12',
+                center: nadorCenter,
+                zoom: 13
+            });
+            
+            // Create marker element
+            const markerElement = document.createElement('div');
+            markerElement.className = 'map-marker';
+            
+            // Create marker instance (initially not added to map)
+            const marker = new mapboxgl.Marker({
+                element: markerElement,
+                draggable: true
+            });
+            
+            // Simple function to set a default address while waiting for geocoding
+            function setDefaultAddress(lngLat) {
+                const defaultAddress = `Point sélectionné à Nador (${lngLat.lng.toFixed(6)}, ${lngLat.lat.toFixed(6)})`;
+                document.getElementById('pickup_address').value = defaultAddress;
+                document.getElementById('pickup_coordinates').value = `${lngLat.lng},${lngLat.lat}`;
+                document.getElementById('selected_address_display').textContent = defaultAddress;
+                
+                // Also update summary if it exists
+                if (document.getElementById('confirmPickupAddress')) {
+                    document.getElementById('confirmPickupAddress').textContent = defaultAddress;
+                }
+            }
+            
+            // Function to update the address display using reverse geocoding
+            function updateAddressDisplay(lngLat) {
+                // First update with default value immediately so user sees something
+                setDefaultAddress(lngLat);
+                
+                // Then try to get a better address with geocoding
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}&language=fr&limit=1`;
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.features && data.features.length > 0) {
+                            // Use place_name as it's the most complete address
+                            const address = data.features[0].place_name;
+                            
+                            // Format for display
+                            const displayAddress = address.split(', ').slice(0, 2).join(', ') + ', Nador';
+                            
+                            // Update display and form values
+                            document.getElementById('pickup_address').value = displayAddress;
+                            document.getElementById('selected_address_display').textContent = displayAddress;
+                            
+                            console.log("Address updated to:", displayAddress);
+                            
+                            // Also update summary if it exists
+                            if (document.getElementById('confirmPickupAddress')) {
+                                document.getElementById('confirmPickupAddress').textContent = displayAddress;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error during reverse geocoding:', error);
+                        // Default address was already set, so we don't need to do anything here
+                    });
+            }
+            
+            // Add click event to the map to place marker
+            map.on('click', function(e) {
+                // Set marker position
+                marker.setLngLat(e.lngLat).addTo(map);
+                
+                // Update address display
+                updateAddressDisplay(e.lngLat);
+            });
+            
+            // Update address when marker is dragged
+            marker.on('dragend', function() {
+                const lngLat = marker.getLngLat();
+                updateAddressDisplay(lngLat);
+            });
+            
+            // Add controls to the map
+            map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+            
+            // Restrict map view to Nador region
+            const nadorBounds = [
+                [-3.0500, 35.1300], // Southwest coordinates
+                [-2.8800, 35.1900]  // Northeast coordinates
+            ];
+            map.setMaxBounds(nadorBounds);
+            
+            // Add locate user control
+            map.addControl(
+                new mapboxgl.GeolocateControl({
+                    positionOptions: {
+                        enableHighAccuracy: true
+                    },
+                    trackUserLocation: true,
+                    showUserHeading: true
+                }),
+                'top-right'
+            );
+        });
+    </script>
+    
     <script>
         // Simple transitions between steps could be implemented here
     </script>

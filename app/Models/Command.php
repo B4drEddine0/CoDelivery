@@ -29,6 +29,17 @@ class Command extends Model
         'priority',
         'accepted_at',
         'delivered_at',
+        'pickup_latitude',
+        'pickup_longitude',
+        'delivery_latitude',
+        'delivery_longitude',
+        'livreur_latitude',
+        'livreur_longitude',
+        'client_latitude',
+        'client_longitude',
+        'livreur_location_updated_at',
+        'client_location_updated_at',
+        'location_updated_at',
     ];
 
     /**
@@ -40,6 +51,9 @@ class Command extends Model
         'price' => 'decimal:2',
         'accepted_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'livreur_location_updated_at' => 'datetime',
+        'client_location_updated_at' => 'datetime',
+        'location_updated_at' => 'datetime',
     ];
 
     /**

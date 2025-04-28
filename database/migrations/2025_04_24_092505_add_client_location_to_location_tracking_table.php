@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('location_tracking', function (Blueprint $table) {
-            $table->decimal('client_latitude', 10, 7)->nullable();
-            $table->decimal('client_longitude', 10, 7)->nullable();
-            $table->timestamp('client_location_updated_at')->nullable();
+            // Removed all tracking and real-time location fields from location tracking migrations
         });
     }
 

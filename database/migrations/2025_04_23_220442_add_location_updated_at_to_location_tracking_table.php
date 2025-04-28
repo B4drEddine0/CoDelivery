@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('location_tracking', function (Blueprint $table) {
-            $table->timestamp('location_updated_at')->nullable();
+            $table->dropColumn('location_updated_at');
         });
     }
 

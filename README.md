@@ -3,14 +3,13 @@
 ## Contexte et Définition du Projet
 CoDelivery est une plateforme innovante destinée à simplifier la gestion des commandes dans le domaine de la livraison. Notre objectif est de mettre en relation des clients, qui publient des commandes, et des livreurs, qui les réalisent, en proposant un environnement sécurisé, intuitif, et efficace.
 
-Cette initiative reflète notre volonté de moderniser le secteur logistique en mettant à profit les technologies web pour optimiser les interactions entre les acteurs. En s'appuyant sur une interface moderne et des fonctionnalités de suivi en temps réel, CoDelivery vise à devenir un acteur clé dans le domaine de la livraison à la demande.
+Cette initiative reflète notre volonté de moderniser le secteur logistique en mettant à profit les technologies web pour optimiser les interactions entre les acteurs.
 
 ## Objectif de la Plateforme
 L'objectif principal de CoDelivery est de créer un site web fonctionnel permettant :
 
 ### Pour les clients :
 - Publier des commandes rapidement
-- Suivre l'état des commandes en temps réel
 - Consulter les performances des livreurs ayant pris leurs commandes
 
 ### Pour les livreurs :
@@ -21,7 +20,7 @@ L'objectif principal de CoDelivery est de créer un site web fonctionnel permett
 ### Objectifs SMART :
 - **Spécifique** : Permettre une gestion fluide et sécurisée des commandes
 - **Mesurable** : Atteindre un volume de 500 commandes par mois d'ici 6 mois après le lancement
-- **Actionnable** : Mettre en œuvre des fonctionnalités de suivi et de notification automatisées
+- **Actionnable** : Mettre en œuvre des notifications automatisées
 - **Pertinent** : Répondre aux besoins croissants d'un marché logistique digitalisé
 - **Temporel** : Déployer la plateforme d'ici 3 mois
 
@@ -37,7 +36,7 @@ CoDelivery s'adresse principalement au marché national avec une possibilité d'
 ### Système de gestion des utilisateurs
 #### Clients :
 - Inscription et gestion du profil
-- Création, publication, et suivi des commandes
+- Création et publication des commandes
 - Consultation des livreurs et des performances (statistiques et historique)
 
 #### Livreurs :

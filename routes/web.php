@@ -18,6 +18,8 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Common route for both clients and livreurs
+Route::middleware('auth')->put('/commands/{command}', [CommandController::class, 'update'])->name('commands.update');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
@@ -37,9 +39,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/commands', [CommandController::class, 'store'])->name('commands.store');
             Route::get('/commands/{command}', [CommandController::class, 'show'])->name('commands.show');
             Route::post('/commands/{command}/cancel', [CommandController::class, 'cancel'])->name('commands.cancel');
-            Route::get('/commands/{command}/track', [TrackingController::class, 'show'])->name('commands.track');
-            Route::post('/commands/{command}/update-client-location', [TrackingController::class, 'updateClientLocation'])->name('commands.update-client-location');
             Route::post('/store-location', [ClientController::class, 'storeLocation'])->name('store-location');
+
+            // Command tracking route
+            Route::get('/commands/{command}/track', [TrackingController::class, 'showTrackingView'])->name('commands.track');
         });
     });
     
@@ -54,11 +57,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/commands/{command}/complete', [CommandController::class, 'completeDelivery'])->name('commands.complete');
             Route::post('/commands/{command}/cancel', [CommandController::class, 'cancel'])->name('commands.cancel');
             Route::post('/commands/{command}/reset', [CommandController::class, 'reset'])->name('commands.reset');
-            Route::get('/commands/{command}/track', [TrackingController::class, 'show'])->name('commands.track');
-            Route::post('/commands/{command}/update-livreur-location', [TrackingController::class, 'updateLivreurLocation'])->name('commands.update-livreur-location');
             Route::post('/store-location', [LivreurController::class, 'storeLocation'])->name('store-location');
+
+            // Command tracking route
+            Route::get('/commands/{command}/track', [TrackingController::class, 'showTrackingView'])->name('commands.track');
         });
     });
 });
-
-

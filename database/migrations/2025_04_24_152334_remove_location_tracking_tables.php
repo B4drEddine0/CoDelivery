@@ -13,7 +13,6 @@ return new class extends Migration
     {
         // Drop the location_tracking table
         Schema::dropIfExists('location_tracking');
-        
         // Remove location fields from commands table
         Schema::table('commands', function (Blueprint $table) {
             $table->dropColumn([

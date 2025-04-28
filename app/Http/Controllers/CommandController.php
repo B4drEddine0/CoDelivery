@@ -53,12 +53,24 @@ class CommandController extends Controller
             'delivery_address' => 'required|string|max:255',
             'price' => 'nullable|numeric|min:0',
             'priority' => 'required|string|in:low,medium,high',
+            'pickup_coordinates' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
+        }
+
+        // Extract coordinates from pickup_coordinates field
+        $pickup_lat = null;
+        $pickup_lng = null;
+        if ($request->pickup_coordinates) {
+            $coordinates = explode(',', $request->pickup_coordinates);
+            if (count($coordinates) == 2) {
+                $pickup_lng = $coordinates[0];
+                $pickup_lat = $coordinates[1];
+            }
         }
 
         $command = Command::create([
@@ -72,6 +84,8 @@ class CommandController extends Controller
             'price' => $request->price ?? 0,
             'status' => 'pending',
             'priority' => $request->priority,
+            'pickup_latitude' => $pickup_lat,
+            'pickup_longitude' => $pickup_lng,
         ]);
 
         return redirect()->route('client.dashboard')
@@ -223,5 +237,103 @@ class CommandController extends Controller
         
         return redirect()->route('dashboard')
             ->with('error', 'Vous n\'êtes pas autorisé à annuler cette commande.');
+    }
+
+    /**
+     * Handle updates to a command, including the "Continue to iterate" action.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Command  $command
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Command $command)
+    {
+        $user = Auth::user();
+        
+        // Check if the user is authorized to update this command
+        if (!($user->isClient() && $command->client_id == $user->id) && 
+            !($user->isLivreur() && $command->livreur_id == $user->id)) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Vous n\'êtes pas autorisé à modifier cette commande.');
+        }
+        
+        // Handle "continue_iteration" action
+        if ($request->input('action') === 'continue_iteration') {
+            // Reset the command to pending state
+            $command->update([
+                'status' => 'pending',
+                'livreur_id' => null,
+                'accepted_at' => null,
+                'started_at' => null,
+            ]);
+            
+            return redirect()->route('dashboard')
+                ->with('success', 'La commande a été remise en attente. Un nouveau livreur pourra la prendre en charge.');
+        }
+        
+        // Handle other update actions as needed
+        
+        return redirect()->back()
+            ->with('error', 'Action non reconnue.');
+    }
+    
+    /**
+     * Display the tracking view for a specific command.
+     * 
+     * @param Command $command
+     * @return \Illuminate\Http\Response
+     */
+    public function trackCommand(Command $command)
+    {
+        $user = Auth::user();
+        
+        // Security check: Only the client who created the command or the assigned livreur can track it
+        if ($user->id !== $command->client_id && $user->id !== $command->livreur_id) {
+            return redirect()->route('dashboard')->with('error', 'Vous n\'êtes pas autorisé à suivre cette commande.');
+        }
+        
+        return view('tracking.show', [
+            'command' => $command,
+            'isClient' => $user->id === $command->client_id,
+            'mapboxToken' => config('services.mapbox.public_token'),
+            'firebaseConfig' => [
+                'apiKey' => config('services.firebase.api_key'),
+                'authDomain' => config('services.firebase.auth_domain'),
+                'databaseURL' => config('services.firebase.database_url'),
+                'projectId' => config('services.firebase.project_id'),
+                'storageBucket' => config('services.firebase.storage_bucket'),
+                'messagingSenderId' => config('services.firebase.messaging_sender_id'),
+                'appId' => config('services.firebase.app_id')
+            ]
+        ]);
+    }
+    
+    /**
+     * Update the delivery coordinates of a command.
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateDeliveryCoordinates(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'command_id' => 'required|exists:commands,id',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $command = Command::findOrFail($request->command_id);
+        
+        // Update the command
+        $command->update([
+            'delivery_latitude' => $request->latitude,
+            'delivery_longitude' => $request->longitude,
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }
