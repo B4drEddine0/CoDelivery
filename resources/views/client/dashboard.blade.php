@@ -135,6 +135,7 @@
             <h2 class="text-xl font-semibold mb-4">Services disponibles</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <!-- Restaurant -->
+                <a href="{{ route('client.commands.create') }}">
                 <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition-all">
                     <div class="flex flex-col items-center">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
@@ -143,8 +144,10 @@
                         <h3 class="font-medium">Restaurants</h3>
                     </div>
                 </div>
+                </a>
                 
                 <!-- Pharmacy -->
+                <a href="{{ route('client.commands.create') }}">
                 <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition-all">
                     <div class="flex flex-col items-center">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
@@ -153,8 +156,10 @@
                         <h3 class="font-medium">Pharmacies</h3>
                     </div>
                 </div>
+                </a>
                 
                 <!-- Market -->
+                <a href="{{ route('client.commands.create') }}">
                 <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition-all">
                     <div class="flex flex-col items-center">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
@@ -165,8 +170,10 @@
                         <h3 class="font-medium">Courses</h3>
                     </div>
                 </div>
+                </a>
                 
                 <!-- Package -->
+                <a href="{{ route('client.commands.create') }}">
                 <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition-all">
                     <div class="flex flex-col items-center">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
@@ -177,6 +184,7 @@
                         <h3 class="font-medium">Colis</h3>
                     </div>
                 </div>
+                </a>
             </div>
         </div>
         
@@ -226,109 +234,6 @@
         </div>
         @endif
         
-        <!-- Available Delivery Drivers -->
-        <div class="mb-8">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Livreurs disponibles</h2>
-                <div class="flex items-center space-x-2 text-sm">
-                    <span class="text-gray-500">Trier par:</span>
-                    <select class="border rounded-lg py-1 px-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option>Meilleures notes</option>
-                        <option>Distance</option>
-                        <option>Temps estimé</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Driver 1 -->
-                <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer transition-all">
-                    <div class="flex items-center mb-4">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Livreur" class="w-14 h-14 rounded-full object-cover mr-4">
-                        <div>
-                            <h3 class="font-medium">Thomas Martin</h3>
-                            <div class="flex items-center mt-1">
-                                <div class="flex">
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                </div>
-                                <span class="ml-1 text-sm text-gray-600">5.0 (124 livraisons)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center text-sm text-gray-500">
-                        <span><i class="fa-solid fa-location-dot mr-1"></i> À 1.2 km</span>
-                        <span><i class="fa-regular fa-clock mr-1"></i> Disponible</span>
-                        <button class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg transition-colors">
-                            Choisir
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Driver 2 -->
-                <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer transition-all">
-                    <div class="flex items-center mb-4">
-                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Livreur" class="w-14 h-14 rounded-full object-cover mr-4">
-                        <div>
-                            <h3 class="font-medium">Sophie Dubois</h3>
-                            <div class="flex items-center mt-1">
-                                <div class="flex">
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star-half-stroke text-yellow-400"></i>
-                                </div>
-                                <span class="ml-1 text-sm text-gray-600">4.5 (89 livraisons)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center text-sm text-gray-500">
-                        <span><i class="fa-solid fa-location-dot mr-1"></i> À 0.8 km</span>
-                        <span><i class="fa-regular fa-clock mr-1"></i> Disponible</span>
-                        <button class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg transition-colors">
-                            Choisir
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Driver 3 -->
-                <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer transition-all">
-                    <div class="flex items-center mb-4">
-                        <img src="https://randomuser.me/api/portraits/men/76.jpg" alt="Livreur" class="w-14 h-14 rounded-full object-cover mr-4">
-                        <div>
-                            <h3 class="font-medium">Lucas Bernard</h3>
-                            <div class="flex items-center mt-1">
-                                <div class="flex">
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-solid fa-star text-yellow-400"></i>
-                                    <i class="fa-regular fa-star text-yellow-400"></i>
-                                </div>
-                                <span class="ml-1 text-sm text-gray-600">4.0 (56 livraisons)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-between items-center text-sm text-gray-500">
-                        <span><i class="fa-solid fa-location-dot mr-1"></i> À 2.5 km</span>
-                        <span><i class="fa-regular fa-clock mr-1"></i> Disponible</span>
-                        <button class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg transition-colors">
-                            Choisir
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-4 text-center">
-                <button class="text-orange-600 hover:text-orange-700 hover:underline">
-                    Voir plus de livreurs
-                </button>
-            </div>
-        </div>
         
         <!-- Previous Orders -->
         <div>

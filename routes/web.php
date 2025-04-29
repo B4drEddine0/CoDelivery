@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware(\App\Http\Middleware\LivreurMiddleware::class)->group(function () {
             Route::get('/dashboard', [LivreurController::class, 'dashboard'])->name('dashboard');
             Route::get('/commands', [LivreurController::class, 'commands'])->name('commands');
+            Route::get('/historique', [LivreurController::class, 'historique'])->name('historique');
             
             Route::get('/commands/{command}', [CommandController::class, 'show'])->name('commands.show');
             Route::post('/commands/{command}/accept', [CommandController::class, 'accept'])->name('commands.accept');

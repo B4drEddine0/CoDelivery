@@ -16,7 +16,7 @@ class ClientController extends Controller
         
         $recentCommands = $user->clientCommands()
             ->latest()
-            ->take(3)
+            ->take(5)
             ->get();
         
         $ongoingCommand = $user->clientCommands()

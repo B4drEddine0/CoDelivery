@@ -66,8 +66,9 @@
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="{{ route('livreur.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Mes livraisons</a>
+                    <a href="{{ route('livreur.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Tableau de bord</a>
                     <a href="{{ route('livreur.commands') }}" class="text-white hover:text-orange-300 transition-colors">Commandes</a>
+                    <a href="{{ route('livreur.historique') }}" class="text-white hover:text-orange-300 transition-colors">Historique</a>
                     
                     <!-- User Profile -->
                     <div class="relative">
