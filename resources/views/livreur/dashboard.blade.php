@@ -226,7 +226,7 @@
                     </h3>
                     <p class="text-gray-700">{{ $currentCommand->delivery_address }}</p>
                     <div class="mt-3">
-                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($currentCommand->delivery_address) }}" target="_blank" class="text-orange-600 hover:text-orange-700 text-sm flex items-center">
+                        <a href="commands/{{ $currentCommand->id }}/track" class="text-orange-600 hover:text-orange-700 text-sm flex items-center">
                             <i class="fa-solid fa-map-location-dot mr-1"></i>
                             Voir sur la carte
                         </a>
