@@ -65,18 +65,54 @@ class AdminController extends Controller
     /**
      * Display a list of all drivers
      */
-    public function drivers()
+    public function drivers(Request $request)
     {
-        $drivers = User::where('role', 'livreur')->paginate(15);
+        $query = User::where('role', 'livreur');
+        
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'LIKE', "%{$search}%")
+                  ->orWhere('last_name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+        
+        $drivers = $query->paginate(15);
         return view('admin.drivers', compact('drivers'));
     }
 
     /**
      * Display a list of all deliveries
      */
-    public function deliveries()
+    public function deliveries(Request $request)
     {
-        $deliveries = Command::with(['client', 'livreur'])->paginate(15);
+        $query = Command::with(['client', 'livreur']);
+
+        // Filter by status if provided
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('establishment_name', 'LIKE', "%{$search}%")
+                  ->orWhere('title', 'LIKE', "%{$search}%")
+                  ->orWhereHas('client', function($q) use ($search) {
+                      $q->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
+                  })
+                  ->orWhereHas('livreur', function($q) use ($search) {
+                      $q->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        $deliveries = $query->latest()->paginate(15);
         return view('admin.deliveries', compact('deliveries'));
     }
 
