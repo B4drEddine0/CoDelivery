@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users - Codelivery Admin</title>
+    <title>Utilisateurs - Codelivery Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -16,22 +16,22 @@
         </div>
         <nav class="mt-5">
             <div class="px-4">
-                <span class="text-xs text-gray-400 uppercase tracking-wider">Main</span>
+                <span class="text-xs text-gray-400 uppercase tracking-wider">Principal</span>
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200">
                     <i class="fas fa-tachometer-alt mr-3"></i>
-                    <span>Dashboard</span>
+                    <span>Tableau de Bord</span>
                 </a>
                 <a href="{{ route('admin.users') }}" class="flex items-center px-4 py-3 mt-2 text-white bg-orange-700 rounded-lg transition-colors duration-200">
                     <i class="fas fa-users mr-3"></i>
-                    <span>Users</span>
+                    <span>Utilisateurs</span>
                 </a>
                 <a href="{{ route('admin.drivers') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200">
                     <i class="fas fa-car mr-3"></i>
-                    <span>Drivers</span>
+                    <span>Chauffeurs</span>
                 </a>
                 <a href="{{ route('admin.deliveries') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200">
                     <i class="fas fa-box mr-3"></i>
-                    <span>Deliveries</span>
+                    <span>Livraisons</span>
                 </a>
             </div>
             <div class="px-4 mt-8">
@@ -39,7 +39,7 @@
                     @csrf
                     <button type="submit" class="w-full flex items-center px-4 py-3 mt-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200 text-left">
                         <i class="fas fa-sign-out-alt mr-3"></i>
-                        <span>Logout</span>
+                        <span>Déconnexion</span>
                     </button>
                 </form>
             </div>
@@ -61,17 +61,17 @@
         @endif
 
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-orange-900">Users</h1>
+            <h1 class="text-3xl font-bold text-orange-900">Utilisateurs</h1>
             <div class="flex items-center space-x-2">
                 <form action="{{ route('admin.users') }}" method="GET" class="flex items-center">
                     <div class="relative">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..." class="bg-white border border-gray-300 rounded-lg py-2 px-4 pl-10 w-64 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher..." class="bg-white border border-gray-300 rounded-lg py-2 px-4 pl-10 w-64 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <div class="absolute left-3 top-2.5 text-gray-400">
                             <i class="fas fa-search"></i>
                         </div>
                     </div>
                     <button type="submit" class="ml-2 bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50">
-                        Search
+                        Rechercher
                     </button>
                 </form>
             </div>
@@ -82,10 +82,10 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commandes</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inscrit le</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -118,7 +118,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No users found</td>
+                                <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Aucun utilisateur trouvé</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -141,7 +141,7 @@
     <!-- JavaScript -->
     <script>
         function confirmDelete(id, name) {
-            if (confirm("Are you sure you want to delete " + name + "? This action cannot be undone.")) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer " + name + " ? Cette action est irréversible.")) {
                 const form = document.getElementById('deleteUserForm');
                 form.action = "{{ route('admin.users.delete', ':id') }}".replace(':id', id);
                 form.submit();

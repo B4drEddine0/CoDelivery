@@ -111,4 +111,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Command::class, 'livreur_id');
     }
+    
+    /**
+     * Alias for livreurCommands - get commands assigned to the user as a driver.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function driverCommands(): HasMany
+    {
+        return $this->livreurCommands();
+    }
 }

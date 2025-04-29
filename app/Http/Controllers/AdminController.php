@@ -115,11 +115,11 @@ class AdminController extends Controller
                 $q->where('establishment_name', 'LIKE', "%{$search}%")
                   ->orWhere('title', 'LIKE', "%{$search}%")
                   ->orWhereHas('client', function($q) use ($search) {
-                      $q->where('name', 'LIKE', "%{$search}%")
+                      $q->where('first_name', 'LIKE', "%{$search}%")
                         ->orWhere('email', 'LIKE', "%{$search}%");
                   })
                   ->orWhereHas('livreur', function($q) use ($search) {
-                      $q->where('name', 'LIKE', "%{$search}%")
+                      $q->where('first_name', 'LIKE', "%{$search}%")
                         ->orWhere('email', 'LIKE', "%{$search}%");
                   });
             });

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Details - Codelivery Admin</title>
+    <title>Détails Utilisateur - Codelivery Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -16,22 +16,22 @@
         </div>
         <nav class="mt-5">
             <div class="px-4">
-                <span class="text-xs text-gray-400 uppercase tracking-wider">Main</span>
+                <span class="text-xs text-gray-400 uppercase tracking-wider">Principal</span>
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 {{ request()->routeIs('admin.dashboard') ? 'bg-orange-700 text-white' : 'hover:bg-gray-700' }} rounded-lg transition-colors duration-200">
                     <i class="fas fa-tachometer-alt mr-3"></i>
-                    <span>Dashboard</span>
+                    <span>Tableau de bord</span>
                 </a>
                 <a href="{{ route('admin.users') }}" class="flex items-center px-4 py-3 mt-2 text-white {{ request()->routeIs('admin.users*') ? 'bg-orange-700' : 'hover:bg-gray-700' }} rounded-lg transition-colors duration-200">
                     <i class="fas fa-users mr-3"></i>
-                    <span>Users</span>
+                    <span>Utilisateurs</span>
                 </a>
                 <a href="{{ route('admin.drivers') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 {{ request()->routeIs('admin.drivers*') ? 'bg-orange-700 text-white' : 'hover:bg-gray-700' }} rounded-lg transition-colors duration-200">
                     <i class="fas fa-car mr-3"></i>
-                    <span>Drivers</span>
+                    <span>Chauffeurs</span>
                 </a>
                 <a href="{{ route('admin.deliveries') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 {{ request()->routeIs('admin.deliveries*') ? 'bg-orange-700 text-white' : 'hover:bg-gray-700' }} rounded-lg transition-colors duration-200">
                     <i class="fas fa-box mr-3"></i>
-                    <span>Deliveries</span>
+                    <span>Livraisons</span>
                 </a>
             </div>
             <div class="px-4 mt-8">
@@ -39,7 +39,7 @@
                     @csrf
                     <button type="submit" class="w-full flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200 text-left">
                         <i class="fas fa-sign-out-alt mr-3"></i>
-                        <span>Logout</span>
+                        <span>Déconnexion</span>
                     </button>
                 </form>
             </div>
@@ -66,7 +66,7 @@
                 <a href="{{ route('admin.users') }}" class="mr-2 p-2 bg-gray-200 hover:bg-gray-300 rounded-full">
                     <i class="fas fa-arrow-left text-gray-600"></i>
                 </a>
-                <h1 class="text-3xl font-bold text-orange-900">User Details</h1>
+                <h1 class="text-3xl font-bold text-orange-900">Détails de l'utilisateur</h1>
             </div>
             <div class="flex items-center">
                 <div class="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
@@ -93,18 +93,18 @@
                         <p class="font-medium">{{ $user->email }}</p>
                     </div>
                     <div class="mb-4">
-                        <span class="text-sm text-gray-500">Phone</span>
-                        <p class="font-medium">{{ $user->phone ?? 'Not provided' }}</p>
+                        <span class="text-sm text-gray-500">Téléphone</span>
+                        <p class="font-medium">{{ $user->phone ?? 'Non renseigné' }}</p>
                     </div>
                     <div class="mb-4">
-                        <span class="text-sm text-gray-500">Joined</span>
+                        <span class="text-sm text-gray-500">Inscrit le</span>
                         <p class="font-medium">{{ $user->created_at->format('d M, Y') }}</p>
                     </div>
                 </div>
 
                 <div class="mt-6 flex">
                     <button onclick="confirmDeleteUser({{ $user->id }}, '{{ $user->full_name }}')" class="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded flex items-center justify-center">
-                        <i class="fas fa-trash mr-2"></i> Delete User
+                        <i class="fas fa-trash mr-2"></i> Supprimer l'utilisateur
                     </button>
                 </div>
             </div>
@@ -113,19 +113,19 @@
             <div class="col-span-1 md:col-span-2">
                 <!-- Stats -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h3 class="text-lg font-semibold text-orange-900 mb-4">User Statistics</h3>
+                    <h3 class="text-lg font-semibold text-orange-900 mb-4">Statistiques utilisateur</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <div class="text-2xl font-bold text-orange-600">{{ $deliveries->total() }}</div>
-                            <div class="text-sm text-gray-500">Total Orders</div>
+                            <div class="text-sm text-gray-500">Commandes totales</div>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <div class="text-2xl font-bold text-green-600">{{ $user->clientCommands()->where('status', 'delivered')->count() }}</div>
-                            <div class="text-sm text-gray-500">Completed</div>
+                            <div class="text-sm text-gray-500">Terminées</div>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <div class="text-2xl font-bold text-blue-600">{{ $user->clientCommands()->whereIn('status', ['pending', 'accepted', 'in_progress'])->count() }}</div>
-                            <div class="text-sm text-gray-500">Active</div>
+                            <div class="text-sm text-gray-500">Actives</div>
                         </div>
                     </div>
                 </div>
@@ -133,8 +133,8 @@
                 <!-- Recent Deliveries -->
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <div class="flex items-center justify-between px-6 py-4 border-b">
-                        <h3 class="text-lg font-semibold text-orange-900">Recent Deliveries</h3>
-                        <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">{{ $deliveries->total() }} deliveries</span>
+                        <h3 class="text-lg font-semibold text-orange-900">Livraisons récentes</h3>
+                        <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">{{ $deliveries->total() }} livraisons</span>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -143,8 +143,8 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">To</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
@@ -182,15 +182,15 @@
                                                 'cancelled' => 'bg-red-100 text-red-800',
                                             ];
                                             $statusLabels = [
-                                                'pending' => 'Pending',
-                                                'accepted' => 'Accepted',
-                                                'in_progress' => 'In Progress',
-                                                'delivered' => 'Completed',
-                                                'cancelled' => 'Cancelled',
+                                                'pending' => 'En attente',
+                                                'accepted' => 'Acceptée',
+                                                'in_progress' => 'En cours',
+                                                'delivered' => 'Terminée',
+                                                'cancelled' => 'Annulée',
                                             ];
                                         @endphp
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClasses[$delivery->status] ?? 'bg-gray-100 text-gray-800' }}">
-                                            {{ $statusLabels[$delivery->status] ?? ucfirst($delivery->status) }}
+                                            {{ $statusLabels[$delivery->status] ?? ucfirst(str_replace('_', ' ', $delivery->status)) }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -204,7 +204,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No deliveries found</td>
+                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Aucune livraison trouvée</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -229,7 +229,7 @@
     <!-- JavaScript -->
     <script>
         function confirmDeleteUser(id, name) {
-            if (confirm("Are you sure you want to delete user: " + name + "? This action cannot be undone.")) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer l'utilisateur " + name + " ? Cette action est irréversible.")) {
                 const form = document.getElementById('deleteUserForm');
                 form.action = "{{ route('admin.users.delete', ':id') }}".replace(':id', id);
                 form.submit();

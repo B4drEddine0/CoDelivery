@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deliveries - Codelivery Admin</title>
+    <title>Livraisons - Codelivery Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -16,22 +16,22 @@
         </div>
         <nav class="mt-5">
             <div class="px-4">
-                <span class="text-xs text-gray-400 uppercase tracking-wider">Main</span>
+                <span class="text-xs text-gray-400 uppercase tracking-wider">Principal</span>
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200">
                     <i class="fas fa-tachometer-alt mr-3"></i>
-                    <span>Dashboard</span>
+                    <span>Tableau de Bord</span>
                 </a>
                 <a href="{{ route('admin.users') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200">
                     <i class="fas fa-users mr-3"></i>
-                    <span>Users</span>
+                    <span>Utilisateurs</span>
                 </a>
                 <a href="{{ route('admin.drivers') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200">
                     <i class="fas fa-car mr-3"></i>
-                    <span>Drivers</span>
+                    <span>Chauffeurs</span>
                 </a>
                 <a href="{{ route('admin.deliveries') }}" class="flex items-center px-4 py-3 mt-2 text-white bg-orange-700 rounded-lg transition-colors duration-200">
                     <i class="fas fa-box mr-3"></i>
-                    <span>Deliveries</span>
+                    <span>Livraisons</span>
                 </a>
             </div>
             <div class="px-4 mt-8">
@@ -39,7 +39,7 @@
                     @csrf
                     <button type="submit" class="w-full flex items-center px-4 py-3 mt-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200 text-left">
                         <i class="fas fa-sign-out-alt mr-3"></i>
-                        <span>Logout</span>
+                        <span>Déconnexion</span>
                     </button>
                 </form>
             </div>
@@ -61,27 +61,27 @@
         @endif
 
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-orange-900">Deliveries</h1>
+            <h1 class="text-3xl font-bold text-orange-900">Livraisons</h1>
             <div class="flex items-center space-x-2">
                 <form action="{{ route('admin.deliveries') }}" method="GET" class="flex items-center">
                     <div class="relative">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..." class="bg-white border border-gray-300 rounded-lg py-2 px-4 pl-10 w-64 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher..." class="bg-white border border-gray-300 rounded-lg py-2 px-4 pl-10 w-64 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <div class="absolute left-3 top-2.5 text-gray-400">
                             <i class="fas fa-search"></i>
                         </div>
                     </div>
                     <button type="submit" class="ml-2 bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50">
-                        Search
+                        Rechercher
                     </button>
                 </form>
                 <div class="ml-2">
                     <select name="status" onchange="location = this.value;" class="bg-white border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                        <option value="{{ route('admin.deliveries', ['status' => '']) }}" {{ !request('status') ? 'selected' : '' }}>All Statuses</option>
-                        <option value="{{ route('admin.deliveries', ['status' => 'pending']) }}" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="{{ route('admin.deliveries', ['status' => 'assigned']) }}" {{ request('status') == 'assigned' ? 'selected' : '' }}>Assigned</option>
-                        <option value="{{ route('admin.deliveries', ['status' => 'in_progress']) }}" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                        <option value="{{ route('admin.deliveries', ['status' => 'completed']) }}" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="{{ route('admin.deliveries', ['status' => 'cancelled']) }}" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                        <option value="{{ route('admin.deliveries', ['status' => '']) }}" {{ !request('status') ? 'selected' : '' }}>Tous les Statuts</option>
+                        <option value="{{ route('admin.deliveries', ['status' => 'pending']) }}" {{ request('status') == 'pending' ? 'selected' : '' }}>En Attente</option>
+                        <option value="{{ route('admin.deliveries', ['status' => 'assigned']) }}" {{ request('status') == 'assigned' ? 'selected' : '' }}>Assignée</option>
+                        <option value="{{ route('admin.deliveries', ['status' => 'in_progress']) }}" {{ request('status') == 'in_progress' ? 'selected' : '' }}>En Cours</option>
+                        <option value="{{ route('admin.deliveries', ['status' => 'completed']) }}" {{ request('status') == 'completed' ? 'selected' : '' }}>Terminée</option>
+                        <option value="{{ route('admin.deliveries', ['status' => 'cancelled']) }}" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Annulée</option>
                     </select>
                 </div>
             </div>
@@ -94,11 +94,11 @@
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Driver</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Establishment Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chauffeur</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom de l'établissement</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créée le</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -114,7 +114,7 @@
                                     <div class="flex items-center">
                                         <div>
                                             <a href="{{ route('admin.users.show', ['user' => $delivery->client_id]) }}" class="text-sm font-medium text-gray-900 hover:text-orange-600">
-                                                {{ $delivery->client ? $delivery->client->full_name : 'Unknown' }}
+                                                {{ $delivery->client ? $delivery->client->full_name : 'Inconnu' }}
                                             </a>
                                         </div>
                                     </div>
@@ -129,7 +129,7 @@
                                             </div>
                                         </div>
                                     @else
-                                        <span class="text-sm text-gray-500">Not assigned</span>
+                                        <span class="text-sm text-gray-500">Non assigné</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $delivery->establishment_name }}</td>
@@ -137,32 +137,39 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
                                         $statusClass = '';
+                                        $statusLabel = '';
                                         switch($delivery->status) {
                                             case 'pending':
                                                 $statusClass = 'bg-yellow-100 text-yellow-800';
+                                                $statusLabel = 'En attente';
                                                 break;
                                             case 'assigned':
                                                 $statusClass = 'bg-blue-100 text-blue-800';
+                                                $statusLabel = 'Assignée';
                                                 break;
                                             case 'in_progress':
                                                 $statusClass = 'bg-purple-100 text-purple-800';
+                                                $statusLabel = 'En cours';
                                                 break;
                                             case 'completed':
                                                 $statusClass = 'bg-green-100 text-green-800';
+                                                $statusLabel = 'Terminée';
                                                 break;
                                             case 'cancelled':
                                                 $statusClass = 'bg-red-100 text-red-800';
+                                                $statusLabel = 'Annulée';
                                                 break;
                                             default:
                                                 $statusClass = 'bg-gray-100 text-gray-800';
+                                                $statusLabel = ucfirst(str_replace('_', ' ', $delivery->status));
                                         }
                                     @endphp
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                                        {{ ucfirst(str_replace('_', ' ', $delivery->status)) }}
+                                        {{ $statusLabel }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $delivery->created_at->format('M d, Y') }}
+                                    {{ $delivery->created_at->format('d M, Y') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-3">
@@ -177,7 +184,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">No deliveries found</td>
+                                <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">Aucune livraison trouvée</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -200,7 +207,7 @@
     <!-- JavaScript -->
     <script>
         function confirmDelete(id) {
-            if (confirm("Are you sure you want to delete this delivery?")) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer cette livraison ?")) {
                 const form = document.getElementById('deleteDeliveryForm');
                 form.action = "{{ route('admin.deliveries.delete', ':command') }}".replace(':command', id);
                 form.submit();
