@@ -113,8 +113,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div>
-                                            <a href="{{ route('admin.users.show', $delivery->user_id) }}" class="text-sm font-medium text-gray-900 hover:text-orange-600">
-                                                {{ $delivery->user ? $delivery->user->full_name : 'Unknown' }}
+                                            <a href="{{ route('admin.users.show', ['user' => $delivery->client_id]) }}" class="text-sm font-medium text-gray-900 hover:text-orange-600">
+                                                {{ $delivery->client ? $delivery->client->full_name : 'Unknown' }}
                                             </a>
                                         </div>
                                     </div>
@@ -123,7 +123,7 @@
                                     @if($delivery->livreur)
                                         <div class="flex items-center">
                                             <div>
-                                                <a href="{{ route('admin.drivers.show', $delivery->livreur_id) }}" class="text-sm font-medium text-gray-900 hover:text-orange-600">
+                                                <a href="{{ route('admin.drivers.show', ['user' => $delivery->livreur_id]) }}" class="text-sm font-medium text-gray-900 hover:text-orange-600">
                                                     {{ $delivery->livreur->full_name }}
                                                 </a>
                                             </div>
@@ -202,7 +202,7 @@
         function confirmDelete(id) {
             if (confirm("Are you sure you want to delete this delivery?")) {
                 const form = document.getElementById('deleteDeliveryForm');
-                form.action = "{{ route('admin.deliveries.delete', '') }}/" + id;
+                form.action = "{{ route('admin.deliveries.delete', ':command') }}".replace(':command', id);
                 form.submit();
             }
         }

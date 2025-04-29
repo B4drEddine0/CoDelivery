@@ -271,7 +271,7 @@
                             <p class="text-sm text-gray-600">{{ $command->client->phone ?? 'No phone' }}</p>
                         </div>
                     </div>
-                    <a href="{{ route('admin.users.show', $command->client->id) }}" class="mt-4 inline-flex items-center text-sm font-medium text-orange-600 hover:text-orange-900">
+                    <a href="{{ route('admin.users.show', ['user' => $command->client->id]) }}" class="mt-4 inline-flex items-center text-sm font-medium text-orange-600 hover:text-orange-900">
                         View customer profile <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                     @else
@@ -325,7 +325,7 @@
         function confirmDeleteDelivery(id) {
             if (confirm("Are you sure you want to delete this delivery? This action cannot be undone.")) {
                 const form = document.getElementById('deleteDeliveryForm');
-                form.action = "{{ route('admin.deliveries.delete', '') }}/" + id;
+                form.action = "{{ route('admin.deliveries.delete', ':command') }}".replace(':command', id);
                 form.submit();
             }
         }

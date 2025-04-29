@@ -386,7 +386,7 @@
 
         // Functions for user actions
         function viewUserDetails(id) {
-            window.location.href = "/admin/users/" + id;
+            window.location.href = `/admin/users/${id}`;
         }
 
         function confirmDeleteUser(id, name) {

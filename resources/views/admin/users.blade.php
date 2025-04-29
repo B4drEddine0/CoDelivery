@@ -98,7 +98,7 @@
                                             <span class="font-semibold text-orange-600">{{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}</span>
                                         </div>
                                         <div>
-                                            <a href="{{ route('admin.users.show', $user->id) }}" class="text-sm font-medium text-gray-900 hover:text-orange-600 transition-colors">{{ $user->full_name }}</a>
+                                            <a href="{{ route('admin.users.show', ['user' => $user->id]) }}" class="text-sm font-medium text-gray-900 hover:text-orange-600 transition-colors">{{ $user->full_name }}</a>
                                         </div>
                                     </div>
                                 </td>
@@ -107,7 +107,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $user->created_at->format('d M, Y') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-3">
-                                        <a href="{{ route('admin.users.show', $user->id) }}" class="text-blue-600 hover:text-blue-900">
+                                        <a href="{{ route('admin.users.show', ['user' => $user->id]) }}" class="text-blue-600 hover:text-blue-900">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <button onclick="confirmDelete({{ $user->id }}, '{{ $user->full_name }}')" class="text-red-600 hover:text-red-900">
