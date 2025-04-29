@@ -157,7 +157,7 @@
         function confirmDelete(id, name) {
             if (confirm("Are you sure you want to delete driver: " + name + "? This may affect assigned deliveries.")) {
                 const form = document.getElementById('deleteDriverForm');
-                form.action = "{{ route('admin.drivers.delete', '') }}/" + id;
+                form.action = "/admin/drivers/" + id;
                 form.submit();
             }
         }

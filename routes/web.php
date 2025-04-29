@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/drivers', [App\Http\Controllers\AdminController::class, 'drivers'])->name('drivers');
             Route::get('/deliveries', [App\Http\Controllers\AdminController::class, 'deliveries'])->name('deliveries');
             Route::delete('/users/{user}', [App\Http\Controllers\AdminController::class, 'deleteUser'])->name('users.delete');
+            Route::delete('/drivers/{user}', [App\Http\Controllers\AdminController::class, 'deleteUser'])->name('drivers.delete');
             Route::delete('/deliveries/{command}', [App\Http\Controllers\AdminController::class, 'deleteDelivery'])->name('deliveries.delete');
             
             // Detail routes
