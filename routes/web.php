@@ -23,7 +23,9 @@ Route::middleware('auth')->put('/commands/{command}', [CommandController::class,
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
-        if (auth()->user()->isClient()) {
+        if (auth()->user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif (auth()->user()->isClient()) {
             return redirect()->route('client.dashboard');
         } else {
             return redirect()->route('livreur.dashboard');
@@ -62,6 +64,23 @@ Route::middleware('auth')->group(function () {
 
             // Command tracking route
             Route::get('/commands/{command}/track', [TrackingController::class, 'showTrackingView'])->name('commands.track');
+        });
+    });
+
+    // Admin routes
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::middleware(\App\Http\Middleware\AdminMiddleware::class)->group(function () {
+            Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('dashboard');
+            Route::get('/users', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
+            Route::get('/drivers', [App\Http\Controllers\AdminController::class, 'drivers'])->name('drivers');
+            Route::get('/deliveries', [App\Http\Controllers\AdminController::class, 'deliveries'])->name('deliveries');
+            Route::delete('/users/{user}', [App\Http\Controllers\AdminController::class, 'deleteUser'])->name('users.delete');
+            Route::delete('/deliveries/{command}', [App\Http\Controllers\AdminController::class, 'deleteDelivery'])->name('deliveries.delete');
+            
+            // Detail routes
+            Route::get('/users/{user}', [App\Http\Controllers\AdminController::class, 'showUser'])->name('users.show');
+            Route::get('/drivers/{user}', [App\Http\Controllers\AdminController::class, 'showDriver'])->name('drivers.show');
+            Route::get('/deliveries/{command}', [App\Http\Controllers\AdminController::class, 'showDelivery'])->name('deliveries.show');
         });
     });
 });

@@ -89,7 +89,9 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            if ($user->isClient()) {
+            if ($user->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->isClient()) {
                 return redirect()->intended(route('client.dashboard'));
             } else {
                 return redirect()->intended(route('livreur.dashboard'));

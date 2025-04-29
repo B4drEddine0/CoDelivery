@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\ClientMiddleware;
 use App\Http\Middleware\LivreurMiddleware;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
@@ -30,4 +31,5 @@ return [
     'auth.session' => AuthenticateSession::class,
     'client' => ClientMiddleware::class,
     'livreur' => LivreurMiddleware::class,
+    'admin' => AdminMiddleware::class,
 ];
