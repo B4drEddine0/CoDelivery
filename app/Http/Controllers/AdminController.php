@@ -56,9 +56,22 @@ class AdminController extends Controller
     /**
      * Display a list of all users
      */
-    public function users()
+    public function users(Request $request)
     {
-        $users = User::where('role', 'client')->paginate(15);
+        $query = User::where('role', 'client');
+        
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'LIKE', "%{$search}%")
+                  ->orWhere('last_name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhere('phone', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $users = $query->paginate(15);
         return view('admin.users', compact('users'));
     }
 
