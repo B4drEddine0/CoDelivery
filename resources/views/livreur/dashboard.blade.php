@@ -295,9 +295,6 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Montant
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -336,11 +333,6 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     {{ number_format($command->price, 2) }} DH
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($command->delivery_address) }}" target="_blank" class="text-orange-600 hover:text-orange-700 text-sm">
-                                        <i class="fa-solid fa-map-location-dot"></i>
-                                    </a>
-                                </td>
                             </tr>
                             @empty
                             <tr>
@@ -358,13 +350,7 @@
             </div>
         </div>
     </main>
-    
-    <!-- Chat Button (Fixed) -->
-    <div class="fixed bottom-8 right-8">
-        <button class="bg-orange-600 hover:bg-orange-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-colors">
-            <i class="fa-solid fa-headset text-2xl"></i>
-        </button>
-    </div>
+
     
     <!-- Footer -->
     <footer class="bg-gray-100 mt-16">

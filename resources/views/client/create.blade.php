@@ -43,14 +43,14 @@
         
         .progress-bar {
             height: 4px;
-            background: linear-gradient(to right, #ea580c 50%, #e5e7eb 50%);
-            background-size: 200% 100%;
+            background: linear-gradient(to right, #ea580c 0%, #ea580c 0%, #e5e7eb 0%, #e5e7eb 100%);
+            background-size: 100% 100%;
             transition: all 0.6s ease;
         }
         
-        .step-1 { background-position: 0 0; }
-        .step-2 { background-position: -100% 0; }
-        .step-3 { background-position: -200% 0; }
+        .step-1 { background: linear-gradient(to right, #ea580c 33.3%, #e5e7eb 33.3%, #e5e7eb 100%); }
+        .step-2 { background: linear-gradient(to right, #ea580c 66.6%, #e5e7eb 66.6%, #e5e7eb 100%); }
+        .step-3 { background: linear-gradient(to right, #ea580c 100%, #e5e7eb 100%, #e5e7eb 100%); }
         
         .animate-fade-in {
             animation: fadeIn 0.5s ease-in-out;
@@ -314,7 +314,7 @@
                     
                     <div>
                         <label for="delivery_address" class="block text-sm font-medium text-gray-700 mb-1">Adresse de livraison</label>
-                        <input type="text" id="delivery_address" name="delivery_address" 
+                        <input type="text" id="delivery_address" name="delivery_address" disabled 
                                class="w-full px-3 py-2 rounded-lg border @error('delivery_address') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
                                placeholder="Où livrer votre commande" value="{{ old('delivery_address') }}" required>
                         @error('delivery_address')

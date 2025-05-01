@@ -159,11 +159,6 @@
             </div>
             
             <form action="{{ route('livreur.commands') }}" method="GET" class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                <!-- Date Filter -->
-                <div class="relative">
-                    <input type="date" name="date" value="{{ request('date') }}" class="appearance-none bg-white border border-gray-300 rounded-lg py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                </div>
-                
                 <!-- Type Filter -->
                 <div class="relative">
                     <select name="service_type" class="appearance-none bg-white border border-gray-300 rounded-lg py-2 px-4 pr-8 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
