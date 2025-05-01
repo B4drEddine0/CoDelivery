@@ -213,9 +213,9 @@
                     <a href="{{ route('client.commands.show', $ongoingCommand->id) }}" class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
                         Détails
                     </a>
-                    <a href="{{ route('client.commands.track', $ongoingCommand->id) }}" class="bg-orange-100 text-orange-600 px-4 py-2 rounded-lg hover:bg-orange-200">
-                        <i class="fa-solid fa-location-dot mr-2"></i>Suivre
-                    </a>
+                    <button onclick="contactLivreur({{ $ongoingCommand->id }})" class="bg-orange-100 text-orange-600 px-4 py-2 rounded-lg hover:bg-orange-200">
+                        <i class="fa-solid fa-phone mr-2"></i>Contact livreur
+                    </button>
                 </div>
             </div>
         </div>
@@ -348,5 +348,52 @@
             </div>
         </div>
     </footer>
+    <script>
+        function contactLivreur(commandId) {
+            $.ajax({
+                url: `/client/commands/${commandId}/contact`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        // Create a modal to display the contact info
+                        const modal = document.createElement('div');
+                        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                        modal.innerHTML = `
+                            <div class="bg-white rounded-lg p-6 shadow-xl max-w-md w-full">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xl font-bold text-gray-900">Contact du livreur</h3>
+                                    <button class="text-gray-500 hover:text-gray-700" onclick="this.parentElement.parentElement.parentElement.remove()">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="mb-4">
+                                    <p class="text-gray-700"><span class="font-semibold">Nom:</span> ${response.name}</p>
+                                    <p class="text-gray-700"><span class="font-semibold">Téléphone:</span> ${response.phone}</p>
+                                </div>
+                                <div class="flex justify-end">
+                                    <a href="tel:${response.phone}" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700">
+                                        <i class="fa-solid fa-phone mr-2"></i>Appeler
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        
+                        document.body.appendChild(modal);
+                    } else {
+                        alert('Une erreur est survenue. Veuillez réessayer.');
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 404) {
+                        alert('Aucun livreur n\'est encore assigné à cette commande.');
+                    } else {
+                        alert('Une erreur est survenue. Veuillez réessayer.');
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>

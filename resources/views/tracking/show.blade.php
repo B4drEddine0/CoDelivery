@@ -39,10 +39,6 @@
             font-size: 14px;
         }
         
-        .client-marker {
-            background-color: #3b82f6; /* blue-500 */
-        }
-        
         .livreur-marker {
             background-color: #ea580c; /* orange-600 */
         }
@@ -127,7 +123,7 @@
 
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div class="mb-6">
-            <h1 class="text-2xl font-bold mb-2">Suivi en temps réel</h1>
+            <h1 class="text-2xl font-bold mb-2">Suivi de la commande</h1>
             <div class="flex flex-wrap items-center gap-2">
                 <div class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm">
                     {{ ucfirst($command->service_type) }}
@@ -190,32 +186,11 @@
                         </div>
                     </div>
                     
-                    <!-- Live Status -->
+                    <!-- Livreur Info -->
                     <div>
-                        <p class="text-sm font-medium text-gray-500 mb-2">Participants</p>
+                        <p class="text-sm font-medium text-gray-500 mb-2">Détails du livreur</p>
                         
                         <div class="space-y-3">
-                            @if($command->client)
-                            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                        <span class="font-semibold text-blue-600 text-sm">
-                                            {{ substr($command->client->first_name, 0, 1) }}{{ substr($command->client->last_name, 0, 1) }}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium">{{ $command->client->first_name }} {{ $command->client->last_name }}</p>
-                                        <p class="text-xs text-gray-500">Client</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center" id="client-status-indicator">
-                                    <div class="h-2 w-2 bg-gray-300 rounded-full mr-2"></div>
-                                    <span class="text-xs text-gray-500">Hors ligne</span>
-                                </div>
-                            </div>
-                            @endif
-                            
-
                             @if($command->livreur)
                             <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
                                 <div class="flex items-center">
@@ -231,7 +206,7 @@
                                 </div>
                                 <div class="flex items-center" id="livreur-status-indicator">
                                     <div class="h-2 w-2 bg-gray-300 rounded-full mr-2"></div>
-                                    <span class="text-xs text-gray-500">Hors ligne</span>
+                                    <span class="text-xs text-gray-500">Statut inconnu</span>
                                 </div>
                             </div>
                             @else
@@ -256,7 +231,7 @@
         <!-- Map Container -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="p-6">
-                <h2 class="text-lg font-semibold mb-4">Localisation en temps réel</h2>
+                <h2 class="text-lg font-semibold mb-4">Localisation</h2>
                 
                 <div class="map-container">
                     <div id="map"></div>
@@ -274,11 +249,6 @@
                 </div>
                 
                 <div class="mt-4 flex flex-wrap gap-4">
-                    <div class="flex items-center">
-                        <div class="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
-                        <span class="text-sm">Client</span>
-                    </div>
-                    
                     <div class="flex items-center">
                         <div class="w-4 h-4 bg-orange-600 rounded-full mr-2"></div>
                         <span class="text-sm">Livreur</span>
@@ -303,10 +273,12 @@
                 Retour aux commandes
             </a>
             
-            <button id="share-location-btn" class="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center">
-                <i class="fa-solid fa-location-dot mr-2"></i>
-                <span>Partager ma localisation</span>
-            </button>
+            @if(!$isClient)
+            <div id="location-status" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg flex items-center">
+                <i class="fa-solid fa-circle-notch fa-spin mr-2 text-orange-500"></i>
+                <span>Localisation en cours...</span>
+            </div>
+            @endif
         </div>
     </div>
 
@@ -317,43 +289,47 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Debug logging
-            console.log('DOMContentLoaded triggered');
-            
-            // Check if Mapbox token is empty and use a fallback
+            // Check if Mapbox token exists or use a fallback
             let mapboxToken = '{{ $mapboxToken }}';
-            console.log('Original Mapbox token:', mapboxToken);
             
             if (!mapboxToken || mapboxToken === '') {
                 // Use a fallback public demo token
                 mapboxToken = 'pk.eyJ1IjoiYmFkcmVkZGluZTAwIiwiYSI6ImNsdzJ0cDJ1bTBtMnQyaW11NjBxczE3Z2kifQ.ockRcbgDpqVyMLsAv_tMgw';
-                console.log('Using fallback Mapbox token');
             }
             
+            // Declare important variables at the top level
+            let map;
+            let database;
+            let commandRef;
+            let livreurLocationRef;
+            let locationWatchId = null;
+            
             try {
-                // Initialize Mapbox with the token
+                // Initialize Mapbox
                 mapboxgl.accessToken = mapboxToken;
                 
                 // Initialize map
-                const map = new mapboxgl.Map({
+                map = new mapboxgl.Map({
                     container: 'map',
                     style: 'mapbox://styles/mapbox/streets-v12',
-                    center: [{{ $command->pickup_longitude ?? -2.9287 }}, {{ $command->pickup_latitude ?? 35.1698 }}],
+                    // If delivery coordinates exist, center on delivery location, otherwise use pickup or default
+                    @if($command->delivery_latitude && $command->delivery_longitude)
+                    center: [{{ $command->delivery_longitude }}, {{ $command->delivery_latitude }}],
+                    @elseif($command->pickup_latitude && $command->pickup_longitude)
+                    center: [{{ $command->pickup_longitude }}, {{ $command->pickup_latitude }}],
+                    @else
+                    center: [-2.9287, 35.1698], // Nador center default
+                    @endif
                     zoom: 13
                 });
                 
-                console.log('Map initialized successfully');
-                
-                // Create markers elements with enhanced styling
+                // Create markers elements
                 const createMarkerElement = (type) => {
                     const element = document.createElement('div');
                     element.className = `${type}-marker`;
                     
-                    if (type === 'client') {
-                        element.innerHTML = '<i class="fa-solid fa-user"></i>';
-                    } else if (type === 'livreur') {
+                    if (type === 'livreur') {
                         element.innerHTML = '<i class="fa-solid fa-motorcycle"></i>';
-                        // Add pulse animation to make livreur more visible
                         element.classList.add('pulse-animation');
                     } else if (type === 'pickup') {
                         element.innerHTML = '<i class="fa-solid fa-store"></i>';
@@ -364,16 +340,12 @@
                     return element;
                 };
                 
-                // Initialize markers (but don't add them to the map yet)
-                const clientMarker = new mapboxgl.Marker({
-                    element: createMarkerElement('client')
-                }).setPopup(new mapboxgl.Popup().setHTML('<p class="font-medium">Client</p><p class="text-sm text-gray-600">{{ $command->client->first_name }} {{ $command->client->last_name }}</p>'));
-                
+                // Initialize livreur marker
                 const livreurMarker = new mapboxgl.Marker({
                     element: createMarkerElement('livreur')
                 }).setPopup(new mapboxgl.Popup().setHTML('<p class="font-medium">Livreur</p><p class="text-sm text-gray-600">{{ $command->livreur ? $command->livreur->first_name . " " . $command->livreur->last_name : "Non assigné" }}</p>'));
                 
-                // Add pickup and delivery markers
+                // Add pickup marker
                 @if($command->pickup_latitude && $command->pickup_longitude)
                 const pickupMarker = new mapboxgl.Marker({
                     element: createMarkerElement('pickup')
@@ -383,31 +355,134 @@
                 .addTo(map);
                 @endif
                 
-                // Function to geocode delivery address and add marker
+                // Add delivery marker
+                @if($command->delivery_latitude && $command->delivery_longitude)
+                // Add detailed logging to verify exact coordinates are being used
+                console.log('Using exact delivery coordinates from database:', {{ $command->delivery_longitude }}, {{ $command->delivery_latitude }});
+                console.log('Original delivery address:', '{{ $command->delivery_address }}');
+
+                const deliveryMarker = new mapboxgl.Marker({
+                    element: createMarkerElement('delivery')
+                })
+                .setLngLat([{{ $command->delivery_longitude }}, {{ $command->delivery_latitude }}])
+                .setPopup(new mapboxgl.Popup().setHTML('<p class="font-medium">Lieu de livraison</p><p class="text-sm text-gray-600">{{ $command->delivery_address }}</p><p class="text-xs">Coordonnées exactes: {{ $command->delivery_latitude }}, {{ $command->delivery_longitude }}</p>'))
+                .addTo(map);
+                @else
+                // If we don't have exact coordinates, try to geocode the address
+                console.log('No delivery coordinates found, attempting to geocode:', '{{ $command->delivery_address }}');
                 const geocodeDeliveryAddress = async () => {
                     try {
-                        const response = await fetch(`/api/geocode?address={{ urlencode($command->delivery_address) }}`);
-                        const data = await response.json();
+                        // Skip geocoding if we already have exact coordinates from the database
+                        @if($command->delivery_latitude && $command->delivery_longitude)
+                        console.log('Skipping geocoding - exact coordinates already exist:', {{ $command->delivery_latitude }}, {{ $command->delivery_longitude }});
+                        return;
+                        @endif
                         
-                        if (data.success) {
-                            // Add delivery marker
+                        // Show geocoding status
+                        showNotification('Recherche de l\'adresse de livraison...', 'info');
+                        
+                        const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/{{ urlencode($command->delivery_address) }}.json?access_token=${mapboxgl.accessToken}&country=ma&limit=1`;
+                        console.log('Geocoding URL:', geocodeUrl);
+                        
+                        const response = await fetch(geocodeUrl);
+                        if (!response.ok) {
+                            throw new Error(`Geocoding error: ${response.status} ${response.statusText}`);
+                        }
+                        
+                        const data = await response.json();
+                        console.log('Geocoding response:', data);
+                        
+                        if (data.features && data.features.length > 0) {
+                            const coordinates = data.features[0].center; // [lng, lat]
+                            console.log('Found coordinates:', coordinates);
+                            
+                            // Add delivery marker with geocoded coordinates
                             const deliveryMarker = new mapboxgl.Marker({
                                 element: createMarkerElement('delivery')
                             })
-                            .setLngLat([data.coordinates.lng, data.coordinates.lat])
-                            .setPopup(new mapboxgl.Popup().setHTML('<p class="font-medium">Lieu de livraison</p><p class="text-sm text-gray-600">{{ $command->delivery_address }}</p>'))
+                            .setLngLat(coordinates)
+                            .setPopup(new mapboxgl.Popup().setHTML('<p class="font-medium">Lieu de livraison</p><p class="text-sm text-gray-600">{{ $command->delivery_address }}</p><p class="text-xs text-gray-500">(Coordonnées approximatives)</p>'))
                             .addTo(map);
                             
-                            // Update command coordinates in database
-                            updateDeliveryCoordinates(data.coordinates.lat, data.coordinates.lng);
+                            // Show success message
+                            showNotification('Adresse de livraison localisée', 'success');
+                            
+                            // Update the fit map function to include this marker
+                            setTimeout(fitMapToMarkers, 500);
+                            
+                            // Save these coordinates to database only if we don't have exact coordinates
+                            @if(!$command->delivery_latitude || !$command->delivery_longitude)
+                            console.log('Saving geocoded coordinates to database');
+                            saveDeliveryCoordinates(coordinates[1], coordinates[0]);
+                            @else
+                            console.log('Not saving geocoded coordinates - exact coordinates already exist');
+                            @endif
+                        } else {
+                            console.error('No features found in geocoding response');
+                            showNotification('Impossible de localiser l\'adresse de livraison', 'error');
+                            
+                            // Try with a more generic search
+                            fallbackGeocoding();
                         }
                     } catch (error) {
                         console.error('Error geocoding delivery address:', error);
+                        showNotification('Erreur lors de la localisation de l\'adresse', 'error');
+                        
+                        // Try with a more generic search
+                        fallbackGeocoding();
                     }
                 };
                 
-                // Function to update delivery coordinates in database
-                const updateDeliveryCoordinates = (lat, lng) => {
+                // Fallback geocoding with just the city name
+                const fallbackGeocoding = async () => {
+                    try {
+                        console.log('Using fallback geocoding with city name');
+                        
+                        // Try to extract a city name from the address or use Nador as fallback
+                        let cityName = '{{ $command->delivery_address }}'.match(/Nador|Beni\s*Ensar|Selouane|Zeghanghane|Al\s*Aroui/i);
+                        cityName = cityName ? cityName[0] : 'Nador';
+                        
+                        const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(cityName)}.json?access_token=${mapboxgl.accessToken}&country=ma&limit=1`;
+                        
+                        const response = await fetch(geocodeUrl);
+                        const data = await response.json();
+                        
+                        if (data.features && data.features.length > 0) {
+                            const coordinates = data.features[0].center; // [lng, lat]
+                            console.log('Found city coordinates:', coordinates);
+                            
+                            // Add delivery marker with geocoded coordinates
+                            const deliveryMarker = new mapboxgl.Marker({
+                                element: createMarkerElement('delivery')
+                            })
+                            .setLngLat(coordinates)
+                            .setPopup(new mapboxgl.Popup().setHTML('<p class="font-medium">Lieu de livraison</p><p class="text-sm text-gray-600">{{ $command->delivery_address }}</p><p class="text-xs text-gray-500">(Position approximative)</p>'))
+                            .addTo(map);
+                            
+                            // Don't save these coordinates as they're too approximate
+                            setTimeout(fitMapToMarkers, 500);
+                        } else {
+                            console.error('Fallback geocoding failed');
+                            
+                            // Use fixed Nador city center coordinates as last resort
+                            const nadorCoords = [-2.9287, 35.1698];
+                            const deliveryMarker = new mapboxgl.Marker({
+                                element: createMarkerElement('delivery')
+                            })
+                            .setLngLat(nadorCoords)
+                            .setPopup(new mapboxgl.Popup().setHTML('<p class="font-medium">Lieu de livraison</p><p class="text-sm text-gray-600">{{ $command->delivery_address }}</p><p class="text-xs text-gray-500">(Position approximative - Centre ville)</p>'))
+                            .addTo(map);
+                            
+                            setTimeout(fitMapToMarkers, 500);
+                        }
+                    } catch (error) {
+                        console.error('Error in fallback geocoding:', error);
+                    }
+                };
+                
+                // Function to save delivery coordinates to database
+                const saveDeliveryCoordinates = (lat, lng) => {
+                    try {
                     fetch('/api/update-delivery-coordinates', {
                         method: 'POST',
                         headers: {
@@ -419,23 +494,29 @@
                             latitude: lat,
                             longitude: lng
                         })
-                    });
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Delivery coordinates saved:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error saving delivery coordinates:', error);
+                        });
+                    } catch (error) {
+                        console.error('Error in saveDeliveryCoordinates:', error);
+                    }
                 };
                 
-                // If delivery coordinates are not set, geocode the address
-                @if(!$command->delivery_latitude || !$command->delivery_longitude)
+                // Try to geocode the delivery address
                 geocodeDeliveryAddress();
-                @else
-                // Add delivery marker
-                const deliveryMarker = new mapboxgl.Marker({
-                    element: createMarkerElement('delivery')
-                })
-                .setLngLat([{{ $command->delivery_longitude }}, {{ $command->delivery_latitude }}])
-                .setPopup(new mapboxgl.Popup().setHTML('<p class="font-medium">Lieu de livraison</p><p class="text-sm text-gray-600">{{ $command->delivery_address }}</p>'))
-                .addTo(map);
                 @endif
                 
-                // Initialize Firebase with enhanced error handling
+                // Initialize Firebase
                 let firebaseConfig = {
                     apiKey: "{{ $firebaseConfig['apiKey'] }}",
                     authDomain: "{{ $firebaseConfig['authDomain'] }}",
@@ -446,11 +527,8 @@
                     appId: "{{ $firebaseConfig['appId'] }}"
                 };
                 
-                // Check if Firebase config is valid
-                console.log('Firebase config:', firebaseConfig);
+                // Fallback if Firebase config is invalid
                 if (!firebaseConfig.databaseURL || firebaseConfig.databaseURL === '') {
-                    // Use a demo Firebase config for testing
-                    console.warn('Using fallback Firebase configuration');
                     firebaseConfig = {
                         apiKey: "AIzaSyA8TUEx1t77QwuILMnRErUCCnQ9J2DyAYY",
                         authDomain: "codelivery-demo.firebaseapp.com",
@@ -462,210 +540,166 @@
                     };
                 }
                 
-                // Initialize Firebase with error handling
-                let database;
+                // Initialize Firebase
                 try {
                     firebase.initializeApp(firebaseConfig);
                     database = firebase.database();
-                    console.log('Firebase initialized successfully');
-                } catch (error) {
-                    console.error('Error initializing Firebase:', error);
-                    document.getElementById('loading').innerHTML = `
-
-                        <div class="flex flex-col items-center">
-                            <div class="text-red-500 mb-2">
-                                <i class="fa-solid fa-exclamation-triangle fa-2x"></i>
-                            </div>
-                            <p class="text-gray-600 font-medium">Erreur de connexion à Firebase</p>
-                            <p class="text-gray-500 text-sm mt-2">Détail: ${error.message}</p>
-                        </div>
-                    `;
-                    return;
-                }
+                    
+                    // Reference to livreur location
+                    commandRef = database.ref(`commands/{{ $command->id }}`);
+                    livreurLocationRef = commandRef.child('locations').child('livreur');
                 
-                // References to database locations with enhanced structure
-                const commandRef = database.ref(`commands/{{ $command->id }}`);
-                const locationsRef = commandRef.child('locations');
-                const clientLocationRef = locationsRef.child('client');
-                const livreurLocationRef = locationsRef.child('livreur');
-                
-                // For debugging
-                commandRef.once('value', snapshot => {
-                    console.log('Firebase command data:', snapshot.val());
-                });
-                
-                // Listen for livreur location changes with enhanced notification
+                    // Listen for livreur location updates
                 livreurLocationRef.on('value', (snapshot) => {
                     const data = snapshot.val();
-                    console.log('Livreur location update received:', data);
                     
                     if (data && data.lat && data.lng) {
-                        // Update livreur marker on the map
+                            // Update livreur marker
                         livreurMarker.setLngLat([data.lng, data.lat]).addTo(map);
                         
                         // Update status indicator
                         updateLivreurStatus(true, formatTimestamp(data.timestamp));
                         
-                        // If client is viewing, add visual notification
-                        if ('{{ $isClient }}' === '1') {
-                            // Flash the livreur marker to make it noticeable
-                            const markerEl = livreurMarker.getElement();
-                            markerEl.style.transform = 'scale(1.3)';
-                            setTimeout(() => {
-                                markerEl.style.transform = 'scale(1)';
-                            }, 700);
-                            
-                            // Show notification
-                            showNotification('Position du livreur mise à jour', 'success');
-                            
-                            // Center map on livreur with smooth animation
-                            map.flyTo({
-                                center: [data.lng, data.lat],
-                                zoom: 15,
-                                duration: 1500
-                            });
-                            
-                            // Draw route between pickup and livreur if map is loaded
-                            if (map.isStyleLoaded() && map.getSource('route')) {
-                                try {
-                                    // Update the route coordinates 
-                                    const routeData = {
-                                        'type': 'Feature',
-                                        'properties': {},
-                                        'geometry': {
-                                            'type': 'LineString',
-                                            'coordinates': [
-                                                [{{ $command->pickup_longitude ?? 'data.lng' }}, {{ $command->pickup_latitude ?? 'data.lat' }}],
-                                                [data.lng, data.lat]
-                                            ]
-                                        }
-                                    };
-                                    map.getSource('route').setData(routeData);
-                                } catch (error) {
-                                    console.error('Error updating route:', error);
-                                }
-                            }
+                            // Fit map to show all markers
+                            fitMapToMarkers();
                         }
-                        
-                        // Fit all markers on the map
-                        fitMapToMarkers();
-                    }
-                }, (error) => {
-                    console.error('Error with livreur location listener:', error);
-                });
-                
-                // Listen for client location changes
-                clientLocationRef.on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    console.log('Client location update received:', data);
+                    }, (error) => {
+                        console.error('Error with livreur location listener:', error);
+                    });
+                            
+                    // Initialize livreur location from database if available
+                    @if($command->livreur_id && $command->livreur_latitude && $command->livreur_longitude)
+                    livreurMarker.setLngLat([{{ $command->livreur_longitude }}, {{ $command->livreur_latitude }}]).addTo(map);
+                    updateLivreurStatus(true, '{{ $command->livreur_location_updated_at ? $command->livreur_location_updated_at->format("H:i") : "Initial" }}');
+                    @endif
                     
-                    if (data && data.lat && data.lng) {
-                        clientMarker.setLngLat([data.lng, data.lat]).addTo(map);
-                        updateClientStatus(true, formatTimestamp(data.timestamp));
-                        fitMapToMarkers();
+                    // If user is livreur, start automatic location updating
+                    if (!{{ $isClient ? 'true' : 'false' }}) {
+                        startLocationTracking();
                     }
-                }, (error) => {
-                    console.error('Error with client location listener:', error);
-                });
-                
-                // Format timestamp for display
-                function formatTimestamp(timestamp) {
-                    if (!timestamp) return '';
-                    const date = new Date(timestamp);
-                    return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
-                }
-                
-                // Fetch initial location data from server with retry mechanism
-                function fetchLocationData(retries = 3) {
-                    fetch(`/api/commands/{{ $command->id }}/location`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                const command = data.command;
-                                console.log('Initial location data:', command);
-                                
-                                // If client location is available, add marker
-                                if (command.client.lat && command.client.lng) {
-                                    clientMarker.setLngLat([command.client.lng, command.client.lat]).addTo(map);
-                                    updateClientStatus(true, command.client.updated_at);
-                                    
-                                    // Also update Firebase
-                                    clientLocationRef.set({
-                                        lat: command.client.lat,
-                                        lng: command.client.lng,
-                                        timestamp: firebase.database.ServerValue.TIMESTAMP
-                                    });
-                                }
-                                
-                                // If livreur location is available, add marker
-                                if (command.livreur.lat && command.livreur.lng) {
-                                    livreurMarker.setLngLat([command.livreur.lng, command.livreur.lat]).addTo(map);
-                                    updateLivreurStatus(true, command.livreur.updated_at);
-                                    
-                                    // Also update Firebase
-                                    livreurLocationRef.set({
-                                        lat: command.livreur.lat,
-                                        lng: command.livreur.lng,
-                                        timestamp: firebase.database.ServerValue.TIMESTAMP
-                                    });
-                                }
-                                
-                                // Add display text showing if livreur location is visible
-                                const statusElement = document.createElement('div');
-                                statusElement.className = 'absolute bottom-2 right-2 bg-white bg-opacity-80 px-3 py-1 rounded-lg shadow-md text-sm font-medium z-20';
-                                if (command.livreur.lat && command.livreur.lng) {
-                                    statusElement.textContent = 'Position du livreur mise à jour';
-                                    statusElement.classList.add('text-green-600');
-                                } else if ('{{ $isClient }}' === '1' && '{{ $command->livreur_id }}') {
-                                    statusElement.textContent = 'En attente de la position du livreur...';
-                                    statusElement.classList.add('text-orange-600');
-                                }
-                                document.querySelector('.map-container').appendChild(statusElement);
-                                
-                                // Fit map to include all markers
-                                fitMapToMarkers();
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching location data:', error);
-                            if (retries > 0) {
-                                console.log(`Retrying fetch... ${retries} attempts left`);
-                                setTimeout(() => fetchLocationData(retries - 1), 2000);
-                            }
-                        })
-                        .finally(() => {
-                            // Hide loading indicator
-                            document.getElementById('loading').style.display = 'none';
-                        });
-                }
-                
-                // Start fetching data
-                fetchLocationData();
-                
-                // Update status indicators with animated transitions
-                function updateClientStatus(isOnline, lastUpdated = null) {
-                    const indicator = document.getElementById('client-status-indicator');
-                    if (!indicator) return;
                     
-                    indicator.innerHTML = `
-                        <div class="h-2 w-2 ${isOnline ? 'bg-green-500' : 'bg-gray-300'} rounded-full mr-2"></div>
-                        <span class="text-xs ${isOnline ? 'text-green-600' : 'text-gray-500'}">${isOnline ? 'En ligne' : 'Hors ligne'}${lastUpdated ? ' ('+lastUpdated+')' : ''}</span>
+                                } catch (error) {
+                    console.error('Error initializing Firebase:', error);
+                    document.getElementById('loading').innerHTML = `
+                        <div class="flex flex-col items-center">
+                            <div class="text-red-500 mb-2">
+                                <i class="fa-solid fa-exclamation-triangle fa-2x"></i>
+                            </div>
+                            <p class="text-gray-600 font-medium">Erreur de connexion</p>
+                            <p class="text-gray-500 text-sm mt-2">Détail: ${error.message}</p>
+                        </div>
                     `;
+                }
+                
+                // Hide loading indicator
+                map.on('load', function() {
+                    document.getElementById('loading').style.display = 'none';
+                        fitMapToMarkers();
+                });
+                
+                // Add map controls
+                map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+                map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+                
+                // Function to start automatic location tracking for livreur
+                function startLocationTracking() {
+                    if (!navigator.geolocation) {
+                        updateLocationStatus('error', 'Géolocalisation non prise en charge par votre navigateur');
+                        return;
+                    }
                     
-                    if (isOnline) {
-                        indicator.classList.add('transition-all');
-                        indicator.style.opacity = '0';
+                    // Stop any existing tracking
+                    if (locationWatchId !== null) {
+                        navigator.geolocation.clearWatch(locationWatchId);
+                    }
+                    
+                    // Get location once immediately
+                    navigator.geolocation.getCurrentPosition(
+                        updateLivreurLocation, 
+                        (error) => {
+                            console.error('Geolocation error:', error);
+                            updateLocationStatus('error', 'Impossible d\'obtenir votre position');
+                        }, 
+                        { enableHighAccuracy: true }
+                    );
+                    
+                    // Then start watching position (updates periodically)
+                    locationWatchId = navigator.geolocation.watchPosition(
+                        updateLivreurLocation,
+                        (error) => {
+                            console.error('Geolocation watch error:', error);
+                            updateLocationStatus('error', 'Erreur de suivi de position');
+                        },
+                        { enableHighAccuracy: true, maximumAge: 15000 }
+                    );
+                    
+                    // Update status to indicate tracking is active
+                    updateLocationStatus('active', 'Localisation active');
+                                }
+                                
+                // Function to update livreur location
+                function updateLivreurLocation(position) {
+                    const { latitude, longitude } = position.coords;
+                                    
+                    // Update in Firebase
+                    if (livreurLocationRef) {
+                                    livreurLocationRef.set({
+                            lat: latitude,
+                            lng: longitude,
+                                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                                    });
+                                }
+                                
+                    // Update in database
+                    fetch('/api/update-location', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            command_id: {{ $command->id }},
+                            latitude,
+                            longitude,
+                            type: 'livreur'
+                        })
+                    }).catch(error => {
+                        console.error('Error updating location in database:', error);
+                    });
+                    
+                    // Update status indicator
+                    updateLocationStatus('updated', 'Position mise à jour');
+                }
+                
+                // Update the location status indicator
+                function updateLocationStatus(status, message) {
+                    const statusElement = document.getElementById('location-status');
+                    if (!statusElement) return;
+                    
+                    switch (status) {
+                        case 'active':
+                            statusElement.className = 'px-6 py-3 bg-green-100 text-green-700 rounded-lg flex items-center';
+                            statusElement.innerHTML = '<i class="fa-solid fa-location-crosshairs mr-2"></i><span>' + message + '</span>';
+                            break;
+                        case 'updated':
+                            statusElement.className = 'px-6 py-3 bg-green-100 text-green-700 rounded-lg flex items-center';
+                            statusElement.innerHTML = '<i class="fa-solid fa-check-circle mr-2"></i><span>' + message + '</span>';
+                            // Reset to active after 2 seconds
                         setTimeout(() => {
-                            indicator.style.opacity = '1';
-                        }, 100);
+                                updateLocationStatus('active', 'Localisation active');
+                            }, 2000);
+                            break;
+                        case 'error':
+                            statusElement.className = 'px-6 py-3 bg-red-100 text-red-700 rounded-lg flex items-center';
+                            statusElement.innerHTML = '<i class="fa-solid fa-exclamation-triangle mr-2"></i><span>' + message + '</span>';
+                            break;
+                        default:
+                            statusElement.className = 'px-6 py-3 bg-gray-100 text-gray-700 rounded-lg flex items-center';
+                            statusElement.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2 text-orange-500"></i><span>' + message + '</span>';
                     }
                 }
                 
+                // Helper functions
                 function updateLivreurStatus(isOnline, lastUpdated = null) {
                     const indicator = document.getElementById('livreur-status-indicator');
                     if (!indicator) return;
@@ -674,273 +708,88 @@
                         <div class="h-2 w-2 ${isOnline ? 'bg-green-500' : 'bg-gray-300'} rounded-full mr-2"></div>
                         <span class="text-xs ${isOnline ? 'text-green-600' : 'text-gray-500'}">${isOnline ? 'En ligne' : 'Hors ligne'}${lastUpdated ? ' ('+lastUpdated+')' : ''}</span>
                     `;
-                    
-                    if (isOnline) {
-                        indicator.classList.add('transition-all');
-                        indicator.style.opacity = '0';
-                        setTimeout(() => {
-                            indicator.style.opacity = '1';
-                        }, 100);
-                    }
                 }
                 
-                // Improved fit map function to handle edge cases
+                function formatTimestamp(timestamp) {
+                    if (!timestamp) return '';
+                    const date = new Date(timestamp);
+                    return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+                    }
+                
                 function fitMapToMarkers() {
                     try {
                         const bounds = new mapboxgl.LngLatBounds();
                         let hasMarkers = false;
                         
-                        // Check if markers have valid coordinates and add to bounds
                         @if($command->pickup_latitude && $command->pickup_longitude)
+                        // Add pickup marker to bounds
+                        console.log('Including pickup marker in bounds:', {{ $command->pickup_longitude }}, {{ $command->pickup_latitude }});
                         bounds.extend([{{ $command->pickup_longitude }}, {{ $command->pickup_latitude }}]);
                         hasMarkers = true;
                         @endif
                         
                         @if($command->delivery_latitude && $command->delivery_longitude)
+                        // Add delivery marker to bounds - these are the exact coordinates selected by the client
+                        console.log('Including delivery marker in bounds:', {{ $command->delivery_longitude }}, {{ $command->delivery_latitude }});
                         bounds.extend([{{ $command->delivery_longitude }}, {{ $command->delivery_latitude }}]);
                         hasMarkers = true;
                         @endif
                         
-                        if (clientMarker._lngLat) {
-                            bounds.extend([clientMarker._lngLat.lng, clientMarker._lngLat.lat]);
-                            hasMarkers = true;
-                        }
-                        
                         if (livreurMarker._lngLat) {
+                            // Add livreur marker to bounds
+                            console.log('Including livreur marker in bounds:', livreurMarker._lngLat.lng, livreurMarker._lngLat.lat);
                             bounds.extend([livreurMarker._lngLat.lng, livreurMarker._lngLat.lat]);
                             hasMarkers = true;
                         }
                         
-                        // Only fit bounds if we have added points
                         if (hasMarkers && !bounds.isEmpty()) {
                             map.fitBounds(bounds, {
                                 padding: 70,
                                 maxZoom: 15,
                                 duration: 1000
                             });
+                            console.log('Map fitted to all markers');
+                        } else {
+                            console.warn('No markers to fit map to');
                         }
                     } catch (error) {
                         console.error('Error fitting map to markers:', error);
                     }
                 }
                 
-                // Add controls to the map
-                map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-                map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
-                
-                // Add a geolocate control to the map for easier user location sharing
-                const geolocateControl = new mapboxgl.GeolocateControl({
-                    positionOptions: {
-                        enableHighAccuracy: true
-                    },
-                    trackUserLocation: true
-                });
-                map.addControl(geolocateControl, 'top-right');
-                
-                // Enhanced share location button with automatic refresh
-                let locationWatchId = null;
-                document.getElementById('share-location-btn').addEventListener('click', function() {
-                    if (navigator.geolocation) {
-                        this.disabled = true;
-                        this.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i><span>Partage en cours...</span>';
-                        
-                        // Stop previous location watching if it exists
-                        if (locationWatchId) {
-                            navigator.geolocation.clearWatch(locationWatchId);
-                        }
-                        
-                        // Function to update location
-                        const updateLocation = (position) => {
-                            const { latitude, longitude } = position.coords;
-                            const userType = '{{ $isClient ? "client" : "livreur" }}';
-                            
-                            // Update in Firebase
-                            if (userType === 'client') {
-                                clientLocationRef.set({
-                                    lat: latitude,
-                                    lng: longitude,
-                                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                                });
-                            } else {
-                                livreurLocationRef.set({
-                                    lat: latitude,
-                                    lng: longitude,
-                                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                                });
-                                
-                                // Also update status to indicate active sharing
-                                commandRef.child('status').set({
-                                    livreurSharingLocation: true,
-                                    lastUpdated: firebase.database.ServerValue.TIMESTAMP
-                                });
-                            }
-                            
-                            // Also update in Laravel backend
-                            fetch('/api/update-location', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                },
-                                body: JSON.stringify({
-                                    command_id: {{ $command->id }},
-                                    latitude,
-                                    longitude,
-                                    type: userType
-                                })
-                            })
-                            .catch(error => {
-                                console.error('Error updating location in backend:', error);
-                            });
-                        };
-                        
-                        // Get position once immediately
-                        navigator.geolocation.getCurrentPosition(updateLocation, 
-                        (error) => {
-                            console.error('Geolocation error:', error);
-                            this.innerHTML = '<i class="fa-solid fa-exclamation-triangle mr-2"></i><span>Accès refusé</span>';
-                            setTimeout(() => {
-                                this.innerHTML = '<i class="fa-solid fa-location-dot mr-2"></i><span>Partager ma localisation</span>';
-                                this.disabled = false;
-                            }, 2000);
-                        }, 
-                        { enableHighAccuracy: true });
-                        
-                        // Then watch position for continuous updates
-                        locationWatchId = navigator.geolocation.watchPosition(updateLocation, 
-                        (error) => {
-                            console.error('Geolocation watch error:', error);
-                            navigator.geolocation.clearWatch(locationWatchId);
-                            locationWatchId = null;
-                            this.innerHTML = '<i class="fa-solid fa-location-dot mr-2"></i><span>Partager ma localisation</span>';
-                            this.disabled = false;
-                        }, 
-                        { enableHighAccuracy: true, maximumAge: 10000 });
-                        
-                        // Update button style to indicate active sharing
-                        this.innerHTML = '<i class="fa-solid fa-broadcast-tower mr-2"></i><span>Position partagée en temps réel</span>';
-                        this.classList.remove('bg-orange-500', 'hover:bg-orange-600');
-                        this.classList.add('bg-green-500', 'hover:bg-green-600');
-                        
-                        // Create stop sharing button
-                        if (!document.getElementById('stop-sharing-btn')) {
-                            const stopSharingBtn = document.createElement('button');
-                            stopSharingBtn.id = 'stop-sharing-btn';
-                            stopSharingBtn.className = 'px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center ml-2';
-                            stopSharingBtn.innerHTML = '<i class="fa-solid fa-stop-circle mr-2"></i><span>Arrêter le partage</span>';
-                            stopSharingBtn.addEventListener('click', function() {
-                                if (locationWatchId) {
-                                    navigator.geolocation.clearWatch(locationWatchId);
-                                    locationWatchId = null;
-                                    
-                                    const shareBtn = document.getElementById('share-location-btn');
-                                    shareBtn.innerHTML = '<i class="fa-solid fa-location-dot mr-2"></i><span>Partager ma localisation</span>';
-                                    shareBtn.disabled = false;
-                                    shareBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
-                                    shareBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
-                                    
-                                    // Remove the stop sharing button
-                                    this.remove();
-                                }
-                            });
-                            
-                            // Add the stop sharing button next to the share button
-                            this.parentNode.appendChild(stopSharingBtn);
-                        }
-                    } else {
-                        alert('La géolocalisation n\'est pas supportée par votre navigateur.');
-                    }
-                });
-                
-                // Wait for map to load before fitting bounds
-                map.on('load', function() {
-                    console.log('Map loaded');
-                    fitMapToMarkers();
-                    
-                    // Add a route layer for display if we're showing livreur movement
-                    if ('{{ $command->status }}' === 'in_progress' || '{{ $command->status }}' === 'accepted') {
-                        map.addSource('route', {
-                            'type': 'geojson',
-                            'data': {
-                                'type': 'Feature',
-                                'properties': {},
-                                'geometry': {
-                                    'type': 'LineString',
-                                    'coordinates': []
-                                }
-                            }
-                        });
-                        
-                        map.addLayer({
-                            'id': 'route',
-                            'type': 'line',
-                            'source': 'route',
-                            'layout': {
-                                'line-join': 'round',
-                                'line-cap': 'round'
-                            },
-                            'paint': {
-                                'line-color': '#ea580c',
-                                'line-width': 4,
-                                'line-opacity': 0.7
-                            }
-                        });
-                    }
-                });
-            } catch (error) {
-                console.error('Error initializing map or Firebase:', error);
-            }
-        });
-        
-        // Function to show notifications
+                // Show a notification
         function showNotification(message, type = 'info') {
-            // Remove existing notifications
-            const existingNotifications = document.querySelectorAll('.notification');
-            existingNotifications.forEach(n => {
-                if (n.dataset.autoRemove === 'true') {
-                    n.remove();
-                }
-            });
-            
-            // Create notification element
             const notification = document.createElement('div');
-            notification.className = `notification fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transform transition-all duration-500 translate-x-full ${
+                    notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-500 ${
                 type === 'success' ? 'bg-green-100 text-green-800 border-l-4 border-green-500' :
                 type === 'error' ? 'bg-red-100 text-red-800 border-l-4 border-red-500' :
                 'bg-blue-100 text-blue-800 border-l-4 border-blue-500'
             }`;
-            notification.dataset.autoRemove = 'true';
-            
-            // Add icon based on type
-            const icon = document.createElement('i');
-            icon.className = `fa-solid ${
-                type === 'success' ? 'fa-check-circle' :
-                type === 'error' ? 'fa-exclamation-circle' :
-                'fa-info-circle'
-            } mr-2`;
-            
-            const text = document.createElement('span');
-            text.textContent = message;
-            
-            notification.appendChild(icon);
-            notification.appendChild(text);
+                    
+                    notification.textContent = message;
             document.body.appendChild(notification);
             
-            // Animate in
             setTimeout(() => {
-                notification.classList.remove('translate-x-full');
-            }, 100);
-            
-            // Auto remove after delay
+                        notification.classList.add('opacity-0');
             setTimeout(() => {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => {
-                    if (notification.parentNode) {
                         notification.remove();
-                    }
                 }, 500);
-            }, 5000);
+                    }, 3000);
         }
+                
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div class="flex flex-col items-center">
+                        <div class="text-red-500 mb-2">
+                            <i class="fa-solid fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                        <p class="text-gray-600 font-medium">Erreur de chargement</p>
+                        <p class="text-gray-500 text-sm mt-2">Détail: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
     </script>
 </body>
 </html>
