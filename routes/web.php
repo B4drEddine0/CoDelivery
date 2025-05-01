@@ -45,6 +45,9 @@ Route::middleware('auth')->group(function () {
 
             // Command tracking route
             Route::get('/commands/{command}/track', [TrackingController::class, 'showTrackingView'])->name('commands.track');
+            
+            // Livreur contact info route
+            Route::get('/commands/{command}/contact', [ClientController::class, 'getLivreurContact'])->name('commands.contact');
         });
     });
     

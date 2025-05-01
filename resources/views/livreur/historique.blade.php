@@ -101,55 +101,6 @@
                 <h1 class="text-2xl font-bold text-gray-800">Historique des livraisons</h1>
                 <p class="text-gray-600">Consultez toutes vos livraisons passées</p>
             </div>
-            
-            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                <!-- Date Range Selector -->
-                <form action="{{ route('livreur.historique') }}" method="GET" class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                    <div class="relative">
-                        <select name="date_range" onchange="this.form.submit()" class="appearance-none bg-white border border-gray-300 rounded-lg py-2 px-4 pr-8 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                            <option value="">Tous les temps</option>
-                            <option value="this_week" {{ request('date_range') == 'this_week' ? 'selected' : '' }}>Cette semaine</option>
-                            <option value="this_month" {{ request('date_range') == 'this_month' ? 'selected' : '' }}>Ce mois</option>
-                            <option value="last_3_months" {{ request('date_range') == 'last_3_months' ? 'selected' : '' }}>3 derniers mois</option>
-                            <option value="this_year" {{ request('date_range') == 'this_year' ? 'selected' : '' }}>Cette année</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                    </div>
-                    
-                    <!-- Type Filter -->
-                    <div class="relative">
-                        <select name="service_type" onchange="this.form.submit()" class="appearance-none bg-white border border-gray-300 rounded-lg py-2 px-4 pr-8 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                            <option value="all">Tous les types</option>
-                            <option value="restaurant" {{ request('service_type') == 'restaurant' ? 'selected' : '' }}>Restaurant</option>
-                            <option value="pharmacy" {{ request('service_type') == 'pharmacy' ? 'selected' : '' }}>Pharmacie</option>
-                            <option value="market" {{ request('service_type') == 'market' ? 'selected' : '' }}>Courses</option>
-                            <option value="package" {{ request('service_type') == 'package' ? 'selected' : '' }}>Colis</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
-                    </div>
-                    
-                    <!-- Search -->
-                    <div class="relative">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Rechercher..." class="appearance-none bg-white border border-gray-300 rounded-lg py-2 px-4 pl-10 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 w-full">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                        </div>
-                        <button type="submit" class="absolute inset-y-0 right-0 px-3 flex items-center bg-orange-500 text-white rounded-r-lg hover:bg-orange-600">
-                            <span>Rechercher</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
         
         <!-- Statistics Cards -->

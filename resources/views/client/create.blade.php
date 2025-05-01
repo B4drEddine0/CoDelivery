@@ -43,14 +43,14 @@
         
         .progress-bar {
             height: 4px;
-            background: linear-gradient(to right, #ea580c 50%, #e5e7eb 50%);
-            background-size: 200% 100%;
+            background: linear-gradient(to right, #ea580c 0%, #ea580c 0%, #e5e7eb 0%, #e5e7eb 100%);
+            background-size: 100% 100%;
             transition: all 0.6s ease;
         }
         
-        .step-1 { background-position: 0 0; }
-        .step-2 { background-position: -100% 0; }
-        .step-3 { background-position: -200% 0; }
+        .step-1 { background: linear-gradient(to right, #ea580c 33.3%, #e5e7eb 33.3%, #e5e7eb 100%); }
+        .step-2 { background: linear-gradient(to right, #ea580c 66.6%, #e5e7eb 66.6%, #e5e7eb 100%); }
+        .step-3 { background: linear-gradient(to right, #ea580c 100%, #e5e7eb 100%, #e5e7eb 100%); }
         
         .animate-fade-in {
             animation: fadeIn 0.5s ease-in-out;
@@ -244,6 +244,14 @@
                                         <p class="text-sm font-medium mb-1">Adresse sélectionnée:</p>
                                         <p id="selected_address_display" class="text-sm text-gray-700">Aucune adresse sélectionnée</p>
                                     </div>
+                                    
+                                    <!-- Pickup coordinates warning -->
+                                    <div id="pickup_coords_warning" class="mt-2 p-3 bg-red-100 text-red-700 rounded-lg">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            <span>Important: Veuillez sélectionner un lieu de ramassage précis sur la carte!</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -306,12 +314,37 @@
                     
                     <div>
                         <label for="delivery_address" class="block text-sm font-medium text-gray-700 mb-1">Adresse de livraison</label>
-                        <input type="text" id="delivery_address" name="delivery_address" 
+                        <input type="text" id="delivery_address" name="delivery_address" disabled 
                                class="w-full px-3 py-2 rounded-lg border @error('delivery_address') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
                                placeholder="Où livrer votre commande" value="{{ old('delivery_address') }}" required>
                         @error('delivery_address')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
+                        
+                        <!-- Add delivery location map -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sélectionnez l'adresse de livraison sur la carte</label>
+                            <div id="delivery_map" class="w-full h-[250px] rounded-lg mb-3"></div>
+                            <div id="delivery_coords_warning" class="hidden p-3 bg-red-100 text-red-700 rounded-lg mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    <span>Important: Veuillez sélectionner un lieu de livraison précis sur la carte!</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600 mb-2">
+                                <i class="fas fa-info-circle mr-2 text-orange-500"></i>
+                                <span>Cliquez sur la carte pour sélectionner le lieu de livraison</span>
+                            </div>
+                            
+                            <!-- Hidden input to store the delivery coordinates -->
+                            <input type="hidden" id="delivery_coordinates" name="delivery_coordinates" value="">
+                            
+                            <!-- Display the selected delivery address -->
+                            <div class="mt-2 p-3 bg-gray-50 rounded-lg">
+                                <p class="text-sm font-medium mb-1">Adresse de livraison sélectionnée:</p>
+                                <p id="selected_delivery_address_display" class="text-sm text-gray-700">Aucune adresse sélectionnée</p>
+                            </div>
+                        </div>
                     </div>
                     
                     <div>
@@ -507,8 +540,8 @@
                 
                 // Validate all required fields
                 const requiredFields = [
-                    'establishment_name', 'pickup_address', 'title',
-                    'delivery_address', 'price'
+                    'establishment_name', 'pickup_address', 'pickup_coordinates', 
+                    'title', 'delivery_address', 'delivery_coordinates', 'price'
                 ];
                 
                 let valid = true;
@@ -523,10 +556,66 @@
                 });
                 
                 if (!valid) {
-                    alert('Veuillez remplir tous les champs obligatoires.');
+                    alert('Veuillez remplir tous les champs obligatoires et sélectionner les emplacements sur les cartes.');
                     return false;
                 }
                 
+                // Enhanced validation for coordinates
+                const pickupCoords = document.getElementById('pickup_coordinates').value;
+                const deliveryCoords = document.getElementById('delivery_coordinates').value;
+                
+                if (!pickupCoords || !deliveryCoords) {
+                    alert('Veuillez sélectionner les emplacements précis sur les cartes de ramassage et de livraison.');
+                    return false;
+                }
+                
+                // Validate coordinate format
+                if (!pickupCoords.match(/^-?\d+\.\d+,-?\d+\.\d+$/) || !deliveryCoords.match(/^-?\d+\.\d+,-?\d+\.\d+$/)) {
+                    alert('Format des coordonnées invalide. Veuillez sélectionner à nouveau les emplacements sur les cartes.');
+                    return false;
+                }
+                
+                // Process the coordinates for database storage
+                if (pickupCoords) {
+                    const [pickupLng, pickupLat] = pickupCoords.split(',');
+                    
+                    // Add hidden fields for individual coordinates
+                    const pickupLatField = document.createElement('input');
+                    pickupLatField.type = 'hidden';
+                    pickupLatField.name = 'pickup_latitude';
+                    pickupLatField.value = pickupLat;
+                    this.appendChild(pickupLatField);
+                    
+                    const pickupLngField = document.createElement('input');
+                    pickupLngField.type = 'hidden';
+                    pickupLngField.name = 'pickup_longitude';
+                    pickupLngField.value = pickupLng;
+                    this.appendChild(pickupLngField);
+                    
+                    console.log('Submitting pickup coordinates:', pickupLng, pickupLat);
+                }
+                
+                if (deliveryCoords) {
+                    const [deliveryLng, deliveryLat] = deliveryCoords.split(',');
+                    
+                    // Log exact coordinates before submission
+                    console.log('Submitting delivery coordinates:', deliveryLng, deliveryLat);
+                    
+                    // Add hidden fields for individual coordinates
+                    const deliveryLatField = document.createElement('input');
+                    deliveryLatField.type = 'hidden';
+                    deliveryLatField.name = 'delivery_latitude';
+                    deliveryLatField.value = deliveryLat;
+                    this.appendChild(deliveryLatField);
+                    
+                    const deliveryLngField = document.createElement('input');
+                    deliveryLngField.type = 'hidden';
+                    deliveryLngField.name = 'delivery_longitude';
+                    deliveryLngField.value = deliveryLng;
+                    this.appendChild(deliveryLngField);
+                }
+                
+                console.log('Form validation successful, submitting with coordinates');
                 // Submit the form
                 this.submit();
             });
@@ -717,6 +806,11 @@
                 
                 if (!pickupCoordinates || !pickupAddress) {
                     alert('Veuillez sélectionner un lieu de ramassage sur la carte avant de continuer.');
+                    // Show warning
+                    const warning = document.getElementById('pickup_coords_warning');
+                    if (warning) warning.classList.remove('hidden');
+                    // Scroll to the map
+                    document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
                     return;
                 }
                 
@@ -732,18 +826,42 @@
                     if (document.getElementById('price')) {
                         document.getElementById('price').dispatchEvent(new Event('change'));
                     }
+                    
+                    // Check for delivery coordinates warning visibility 
+                    const warning = document.getElementById('delivery_coords_warning');
+                    if (warning) {
+                        // Show warning if no coordinates are set yet
+                        if (!document.getElementById('delivery_coordinates').value) {
+                            warning.classList.remove('hidden');
+                        } else {
+                            warning.classList.add('hidden');
+                        }
+                    }
                 }, 100);
             }
             
             if (currentStep === 2 && step > currentStep) {
                 const title = document.getElementById('title').value;
                 const deliveryAddress = document.getElementById('delivery_address').value;
+                const deliveryCoordinates = document.getElementById('delivery_coordinates').value;
                 const price = document.getElementById('price').value;
                 
                 if (!title || !deliveryAddress || !price) {
                     alert('Veuillez remplir le nom de la commande, l\'adresse de livraison et le prix avant de continuer.');
                     return;
                 }
+                
+                if (!deliveryCoordinates) {
+                    alert('Veuillez sélectionner le lieu de livraison exact sur la carte avant de continuer.');
+                    // Show warning
+                    const warning = document.getElementById('delivery_coords_warning');
+                    if (warning) warning.classList.remove('hidden');
+                    // Scroll to the map
+                    document.getElementById('delivery_map').scrollIntoView({ behavior: 'smooth' });
+                    return;
+                }
+                
+                console.log('Moving to step 3 with delivery coordinates:', deliveryCoordinates);
             }
             
             // We no longer need to handle showing/hiding the side summary
@@ -821,7 +939,7 @@
     <!-- Mapbox Script -->
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
     <script>
-        // Initialize map when the DOM is loaded
+        // Initialize maps when the DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Mapbox token
             mapboxgl.accessToken = 'pk.eyJ1IjoiYmFkcmVkZGluZTAwIiwiYSI6ImNsdzJ0cDJ1bTBtMnQyaW11NjBxczE3Z2kifQ.ockRcbgDpqVyMLsAv_tMgw';
@@ -829,35 +947,116 @@
             // Nador city center coordinates
             const nadorCenter = [-2.9287, 35.1698];
             
-            // Initialize map centered on Nador
-            const map = new mapboxgl.Map({
+            // Initialize pickup map centered on Nador
+            const pickupMap = new mapboxgl.Map({
                 container: 'map',
                 style: 'mapbox://styles/mapbox/streets-v12',
                 center: nadorCenter,
                 zoom: 13
             });
             
-            // Create marker element
-            const markerElement = document.createElement('div');
-            markerElement.className = 'map-marker';
+            // Create pickup marker element
+            const pickupMarkerElement = document.createElement('div');
+            pickupMarkerElement.className = 'map-marker';
             
-            // Create marker instance (initially not added to map)
-            const marker = new mapboxgl.Marker({
-                element: markerElement,
+            // Create pickup marker instance (initially not added to map)
+            const pickupMarker = new mapboxgl.Marker({
+                element: pickupMarkerElement,
                 draggable: true
             });
             
-            // Simple function to set a default address while waiting for geocoding
+            // Initialize delivery map (when step 2 is loaded)
+            let deliveryMap = null;
+            let deliveryMarker = null;
+            
+            // Function to initialize the delivery map
+            function initDeliveryMap() {
+                if (deliveryMap) return; // Already initialized
+                
+                // Check if the delivery map container exists
+                const deliveryMapContainer = document.getElementById('delivery_map');
+                if (!deliveryMapContainer) return;
+                
+                // Create the delivery map
+                deliveryMap = new mapboxgl.Map({
+                    container: 'delivery_map',
+                    style: 'mapbox://styles/mapbox/streets-v12',
+                    center: nadorCenter,
+                    zoom: 13
+                });
+                
+                // Create delivery marker element
+                const deliveryMarkerElement = document.createElement('div');
+                deliveryMarkerElement.className = 'map-marker';
+                deliveryMarkerElement.style.backgroundColor = '#ef4444'; // Red for delivery
+                
+                // Create delivery marker instance
+                deliveryMarker = new mapboxgl.Marker({
+                    element: deliveryMarkerElement,
+                    draggable: true
+                });
+                
+                // Add click event to the delivery map to place marker
+                deliveryMap.on('click', function(e) {
+                    // Set marker position
+                    deliveryMarker.setLngLat(e.lngLat).addTo(deliveryMap);
+                    
+                    // Update delivery address display
+                    updateDeliveryAddressDisplay(e.lngLat);
+                });
+                
+                // Update address when delivery marker is dragged
+                deliveryMarker.on('dragend', function() {
+                    const lngLat = deliveryMarker.getLngLat();
+                    updateDeliveryAddressDisplay(lngLat);
+                });
+                
+                // Add controls to the delivery map
+                deliveryMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+                
+                // Add locate user control to delivery map
+                deliveryMap.addControl(
+                    new mapboxgl.GeolocateControl({
+                        positionOptions: {
+                            enableHighAccuracy: true
+                        },
+                        trackUserLocation: true,
+                        showUserHeading: true
+                    }),
+                    'top-right'
+                );
+                
+                // Restrict map view to Nador region
+                const nadorBounds = [
+                    [-3.0500, 35.1300], // Southwest coordinates
+                    [-2.8800, 35.1900]  // Northeast coordinates
+                ];
+                deliveryMap.setMaxBounds(nadorBounds);
+            }
+            
+            // Simple function to set a default pickup address while waiting for geocoding
             function setDefaultAddress(lngLat) {
                 const defaultAddress = `Point sélectionné à Nador (${lngLat.lng.toFixed(6)}, ${lngLat.lat.toFixed(6)})`;
                 document.getElementById('pickup_address').value = defaultAddress;
                 document.getElementById('pickup_coordinates').value = `${lngLat.lng},${lngLat.lat}`;
                 document.getElementById('selected_address_display').textContent = defaultAddress;
                 
+                // Add visual feedback that coordinates are selected
+                const displayElement = document.getElementById('selected_address_display');
+                if (displayElement) {
+                    displayElement.classList.add('font-semibold', 'text-green-600');
+                }
+                
+                // Hide the warning since coordinates are now set
+                const warning = document.getElementById('pickup_coords_warning');
+                if (warning) warning.classList.add('hidden');
+                
                 // Also update summary if it exists
                 if (document.getElementById('confirmPickupAddress')) {
                     document.getElementById('confirmPickupAddress').textContent = defaultAddress;
                 }
+                
+                console.log("Pickup coordinates saved:", lngLat.lng, lngLat.lat);
             }
             
             // Function to update the address display using reverse geocoding
@@ -882,7 +1081,11 @@
                             document.getElementById('pickup_address').value = displayAddress;
                             document.getElementById('selected_address_display').textContent = displayAddress;
                             
+                            // Keep coordinates value - very important!
+                            document.getElementById('pickup_coordinates').value = `${lngLat.lng},${lngLat.lat}`;
+                            
                             console.log("Address updated to:", displayAddress);
+                            console.log("Pickup coordinates confirmed:", lngLat.lng, lngLat.lat);
                             
                             // Also update summary if it exists
                             if (document.getElementById('confirmPickupAddress')) {
@@ -896,33 +1099,100 @@
                     });
             }
             
-            // Add click event to the map to place marker
-            map.on('click', function(e) {
+            // Simple function to set a default delivery address while waiting for geocoding
+            function setDefaultDeliveryAddress(lngLat) {
+                const defaultAddress = `Point sélectionné à Nador (${lngLat.lng.toFixed(6)}, ${lngLat.lat.toFixed(6)})`;
+                document.getElementById('delivery_address').value = defaultAddress;
+                document.getElementById('delivery_coordinates').value = `${lngLat.lng},${lngLat.lat}`;
+                document.getElementById('selected_delivery_address_display').textContent = defaultAddress;
+                
+                // Add visual feedback that coordinates are selected
+                const displayElement = document.getElementById('selected_delivery_address_display');
+                if (displayElement) {
+                    displayElement.classList.add('font-semibold', 'text-green-600');
+                }
+                
+                // Also update summary
+                if (document.getElementById('confirmDeliveryAddress')) {
+                    document.getElementById('confirmDeliveryAddress').textContent = defaultAddress;
+                }
+                
+                console.log("Delivery coordinates saved:", lngLat.lng, lngLat.lat);
+            }
+            
+            // Function to update the delivery address display using reverse geocoding
+            function updateDeliveryAddressDisplay(lngLat) {
+                // First update with default value immediately so user sees something
+                setDefaultDeliveryAddress(lngLat);
+                
+                // Store the exact marker coordinates as the most important data
+                document.getElementById('delivery_coordinates').value = `${lngLat.lng},${lngLat.lat}`;
+                console.log("Exact delivery coordinates saved:", lngLat.lng, lngLat.lat);
+                
+                // Hide the warning since coordinates are now set
+                const warning = document.getElementById('delivery_coords_warning');
+                if (warning) warning.classList.add('hidden');
+                
+                // Then try to get a human-readable address with geocoding, but only for display
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}&language=fr&limit=1`;
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.features && data.features.length > 0) {
+                            // Use place_name as it's the most complete address
+                            const address = data.features[0].place_name;
+                            
+                            // Format for display
+                            const displayAddress = address.split(', ').slice(0, 2).join(', ') + ', Nador';
+                            
+                            // Update display and form values, but keep the exact coordinates as the main data
+                            document.getElementById('delivery_address').value = displayAddress;
+                            document.getElementById('selected_delivery_address_display').textContent = displayAddress;
+                            
+                            console.log("Display address updated to:", displayAddress);
+                            console.log("But keeping exact coordinates:", lngLat.lng, lngLat.lat);
+                            
+                            // Also update summary if it exists
+                            if (document.getElementById('confirmDeliveryAddress')) {
+                                document.getElementById('confirmDeliveryAddress').textContent = displayAddress;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error during reverse geocoding for delivery:', error);
+                        // Even if geocoding fails, we already have the coordinates saved
+                        console.log("Geocoding failed, but coordinates are saved:", lngLat.lng, lngLat.lat);
+                    });
+            }
+            
+            // Add click event to the pickup map to place marker
+            pickupMap.on('click', function(e) {
                 // Set marker position
-                marker.setLngLat(e.lngLat).addTo(map);
+                pickupMarker.setLngLat(e.lngLat).addTo(pickupMap);
                 
                 // Update address display
                 updateAddressDisplay(e.lngLat);
             });
             
-            // Update address when marker is dragged
-            marker.on('dragend', function() {
-                const lngLat = marker.getLngLat();
+            // Update address when pickup marker is dragged
+            pickupMarker.on('dragend', function() {
+                const lngLat = pickupMarker.getLngLat();
                 updateAddressDisplay(lngLat);
             });
             
-            // Add controls to the map
-            map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+            // Add controls to the pickup map
+            pickupMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
             
-            // Restrict map view to Nador region
+            // Restrict pickup map view to Nador region
             const nadorBounds = [
                 [-3.0500, 35.1300], // Southwest coordinates
                 [-2.8800, 35.1900]  // Northeast coordinates
             ];
-            map.setMaxBounds(nadorBounds);
+            pickupMap.setMaxBounds(nadorBounds);
             
-            // Add locate user control
-            map.addControl(
+            // Add locate user control to pickup map
+            pickupMap.addControl(
                 new mapboxgl.GeolocateControl({
                     positionOptions: {
                         enableHighAccuracy: true
@@ -932,6 +1202,34 @@
                 }),
                 'top-right'
             );
+            
+            // Check if we need to show/hide the pickup coordinates warning
+            setTimeout(() => {
+                const pickupCoordinates = document.getElementById('pickup_coordinates').value;
+                const warning = document.getElementById('pickup_coords_warning');
+                
+                if (warning) {
+                    if (pickupCoordinates) {
+                        warning.classList.add('hidden');
+                        console.log('Pickup coordinates already set, hiding warning');
+                    } else {
+                        warning.classList.remove('hidden');
+                        console.log('No pickup coordinates set, showing warning');
+                    }
+                }
+            }, 500);
+            
+            // Initialize delivery map when going to step 2
+            const originalGoToStep = window.goToStep;
+            window.goToStep = function(step) {
+                originalGoToStep(step);
+                if (step === 2) {
+                    // After DOM is updated, initialize the delivery map
+                    setTimeout(function() {
+                        initDeliveryMap();
+                    }, 100);
+                }
+            };
         });
     </script>
     

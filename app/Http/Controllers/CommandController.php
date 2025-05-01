@@ -54,6 +54,7 @@ class CommandController extends Controller
             'price' => 'nullable|numeric|min:0',
             'priority' => 'required|string|in:low,medium,high',
             'pickup_coordinates' => 'nullable|string',
+            'delivery_coordinates' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -72,6 +73,17 @@ class CommandController extends Controller
                 $pickup_lat = $coordinates[1];
             }
         }
+        
+        // Extract coordinates from delivery_coordinates field
+        $delivery_lat = null;
+        $delivery_lng = null;
+        if ($request->delivery_coordinates) {
+            $coordinates = explode(',', $request->delivery_coordinates);
+            if (count($coordinates) == 2) {
+                $delivery_lng = $coordinates[0]; 
+                $delivery_lat = $coordinates[1];
+            }
+        }
 
         $command = Command::create([
             'client_id' => Auth::id(),
@@ -86,6 +98,8 @@ class CommandController extends Controller
             'priority' => $request->priority,
             'pickup_latitude' => $pickup_lat,
             'pickup_longitude' => $pickup_lng,
+            'delivery_latitude' => $delivery_lat, 
+            'delivery_longitude' => $delivery_lng,
         ]);
 
         return redirect()->route('client.dashboard')

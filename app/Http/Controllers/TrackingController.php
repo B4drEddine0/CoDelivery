@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TrackingController extends Controller
 {
-    /**
-     * Geocode an address to get coordinates using Mapbox API.
-     */
+  
     public function geocodeAddress(Request $request)
     {
         $validator = Validator::make($request->all(), [
