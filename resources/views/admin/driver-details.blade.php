@@ -9,7 +9,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-gray-100">
-    <!-- Sidebar -->
     <div class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-orange-800 to-orange-950 text-white transition-all duration-300 transform z-30">
         <div class="flex items-center justify-center h-16 border-b border-gray-700">
             <h2 class="text-2xl font-bold">Codelivery</h2>
@@ -46,7 +45,6 @@
         </nav>
     </div>
 
-    <!-- Main Content -->
     <div class="ml-64 p-6">
         @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -60,7 +58,6 @@
             </div>
         @endif
         
-        <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center">
                 <a href="{{ route('admin.drivers') }}" class="mr-2 p-2 bg-gray-200 hover:bg-gray-300 rounded-full">
@@ -77,41 +74,34 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Driver Profile Card -->
             <div class="bg-white rounded-lg shadow-md p-6 col-span-1">
                 <div class="flex flex-col items-center">
                     <div class="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                        <span class="font-bold text-3xl text-blue-600">{{ substr($driver->first_name, 0, 1) }}{{ substr($driver->last_name, 0, 1) }}</span>
+                        <span class="font-bold text-3xl text-blue-600">{{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}</span>
                     </div>
-                    <h2 class="text-xl font-bold text-gray-900">{{ $driver->full_name }}</h2>
+                    <h2 class="text-xl font-bold text-gray-900">{{ $user->full_name }}</h2>
                     <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium mt-2">Chauffeur</span>
                 </div>
 
                 <div class="mt-6 border-t pt-4">
                     <div class="mb-4">
                         <span class="text-sm text-gray-500">Email</span>
-                        <p class="font-medium">{{ $driver->email }}</p>
+                        <p class="font-medium">{{ $user->email }}</p>
                     </div>
                     <div class="mb-4">
                         <span class="text-sm text-gray-500">Téléphone</span>
-                        <p class="font-medium">{{ $driver->phone ?? 'Non renseigné' }}</p>
+                        <p class="font-medium">{{ $user->phone ?? 'Non renseigné' }}</p>
                     </div>
                     <div class="mb-4">
                         <span class="text-sm text-gray-500">Inscrit le</span>
-                        <p class="font-medium">{{ $driver->created_at->format('d M, Y') }}</p>
+                        <p class="font-medium">{{ $user->created_at->format('d M, Y') }}</p>
                     </div>
                 </div>
 
-                <div class="mt-6 flex">
-                    <button onclick="confirmDeleteDriver({{ $driver->id }}, '{{ $driver->full_name }}')" class="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded flex items-center justify-center">
-                        <i class="fas fa-trash mr-2"></i> Supprimer le chauffeur
-                    </button>
-                </div>
+
             </div>
 
-            <!-- Driver Stats and Deliveries -->
             <div class="col-span-1 md:col-span-2">
-                <!-- Stats -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h3 class="text-lg font-semibold text-orange-900 mb-4">Statistiques du chauffeur</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -120,17 +110,16 @@
                             <div class="text-sm text-gray-500">Livraisons totales</div>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <div class="text-2xl font-bold text-green-600">{{ $driver->driverCommands()->where('status', 'completed')->count() }}</div>
+                            <div class="text-2xl font-bold text-green-600">{{ $user->driverCommands()->where('status', 'completed')->count() }}</div>
                             <div class="text-sm text-gray-500">Terminées</div>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <div class="text-2xl font-bold text-blue-600">{{ $driver->driverCommands()->whereIn('status', ['pending', 'assigned', 'in_progress'])->count() }}</div>
+                            <div class="text-2xl font-bold text-blue-600">{{ $user->driverCommands()->whereIn('status', ['pending', 'assigned', 'in_progress'])->count() }}</div>
                             <div class="text-sm text-gray-500">Actives</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Deliveries -->
                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <div class="flex items-center justify-between px-6 py-4 border-b">
                         <h3 class="text-lg font-semibold text-orange-900">Livraisons récentes</h3>
@@ -207,7 +196,6 @@
                         </table>
                     </div>
 
-                    <!-- Pagination -->
                     <div class="p-4 border-t">
                         {{ $deliveries->links() }}
                     </div>
@@ -216,21 +204,7 @@
         </div>
     </div>
 
-    <!-- Delete Driver Form (Hidden) -->
-    <form id="deleteDriverForm" method="POST" style="display: none;">
-        @csrf
-        @method('DELETE')
-    </form>
 
-    <!-- JavaScript -->
-    <script>
-        function confirmDeleteDriver(id, name) {
-            if (confirm("Êtes-vous sûr de vouloir supprimer le chauffeur " + name + " ? Cette action est irréversible.")) {
-                const form = document.getElementById('deleteDriverForm');
-                form.action = "{{ route('admin.drivers.delete', ':id') }}".replace(':id', id);
-                form.submit();
-            }
-        }
-    </script>
+
 </body>
 </html>

@@ -9,7 +9,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-gray-100">
-    <!-- Sidebar -->
     <div class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-orange-800 to-orange-950 text-white transition-all duration-300 transform z-30">
         <div class="flex items-center justify-center h-16 border-b border-gray-700">
             <h2 class="text-2xl font-bold">Codelivery</h2>
@@ -46,7 +45,6 @@
         </nav>
     </div>
 
-    <!-- Main Content -->
     <div class="ml-64 p-6">
         @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -191,20 +189,17 @@
                 </table>
             </div>
             
-            <!-- Pagination -->
             <div class="p-4 border-t">
                 {{ $deliveries->appends(request()->query())->links() }}
             </div>
         </div>
 
-        <!-- Delete Delivery Form (Hidden) -->
         <form id="deleteDeliveryForm" method="POST" style="display: none;">
             @csrf
             @method('DELETE')
         </form>
     </div>
 
-    <!-- JavaScript -->
     <script>
         function confirmDelete(id) {
             if (confirm("Êtes-vous sûr de vouloir supprimer cette livraison ?")) {

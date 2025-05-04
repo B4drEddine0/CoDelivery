@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('commands', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('client_id')->constrained('users')->onDelete('set null');
             $table->foreignId('livreur_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('title');
             $table->text('description')->nullable();
@@ -26,6 +26,10 @@ return new class extends Migration
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             $table->timestamp('accepted_at')->nullable();
             $table->timestamp('delivered_at')->nullable();
+            $table->decimal('pickup_latitude', 10, 7)->nullable();
+            $table->decimal('pickup_longitude', 10, 7)->nullable();
+            $table->decimal('delivery_latitude', 10, 7)->nullable();
+            $table->decimal('delivery_longitude', 10, 7)->nullable();
             $table->timestamps();
         });
     }

@@ -9,7 +9,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-gray-100">
-    <!-- Sidebar -->
     <div class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-orange-800 to-orange-950 text-white transition-all duration-300 transform z-30">
         <div class="flex items-center justify-center h-16 border-b border-gray-700">
             <h2 class="text-2xl font-bold">Codelivery</h2>
@@ -46,7 +45,6 @@
         </nav>
     </div>
 
-    <!-- Main Content -->
     <div class="ml-64 p-6">
         @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -60,7 +58,6 @@
             </div>
         @endif
         
-        <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-orange-900">Tableau de Bord Admin</h1>
             <div class="flex items-center">
@@ -73,7 +70,6 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             <div class="bg-white rounded-lg shadow-md p-6 flex items-center transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-orange-200">
                 <div class="rounded-full bg-orange-100 p-3 mr-4">
@@ -113,7 +109,6 @@
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="mb-6">
             <div class="border-b border-orange-200">
                 <nav class="flex -mb-px">
@@ -130,7 +125,6 @@
             </div>
         </div>
 
-        <!-- Tab Contents -->
         <div id="users" class="tab-content active">
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="flex items-center justify-between px-6 py-4 border-b">
@@ -289,7 +283,6 @@
         </div>
     </div>
 
-    <!-- Modal for Confirmation -->
     <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-md p-6 max-w-sm w-full mx-4">
             <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">Confirmer la suppression</h3>
@@ -301,9 +294,7 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script>
-        // Tab functionality
         function openTab(evt, tabName) {
             var i, tabContent, tabButtons;
             
@@ -323,7 +314,6 @@
             evt.currentTarget.classList.remove("border-transparent", "text-gray-500");
         }
 
-        // Modal functionality
         function closeModal() {
             document.getElementById('confirmationModal').classList.add('hidden');
         }
@@ -335,7 +325,7 @@
             document.getElementById('confirmationModal').classList.remove('hidden');
         }
 
-        // View and delete actions
+      
         function viewUserDetails(id) {
             window.location.href = "{{ route('admin.users.show', ':id') }}".replace(':id', id);
         }

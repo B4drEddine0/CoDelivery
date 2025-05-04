@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoDelivery - Tableau de bord livreur</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -46,20 +47,15 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body class="bg-gray-50">
-    <!-- Header -->
     <header class="bg-gradient-to-r from-orange-800 to-orange-950 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-2">
                     <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Location Pin -->
                         <path d="M32 4c-11 0-20 9-20 20 0 11 20 36 20 36s20-25 20-36c0-11-9-20-20-20z" fill="#EA580C"/>
-                        <!-- Inner Circle -->
                         <circle cx="32" cy="24" r="12" fill="#FB923C"/>
-                        <!-- Package Icon -->
                         <rect x="24" y="18" width="16" height="12" fill="#FFFFFF"/>
                         <path d="M24 22h16M32 18v12" stroke="#EA580C" stroke-width="1.5"/>
-                        <!-- Motion Lines -->
                         <path d="M14 44l-6 6M50 44l6 6" stroke="#FB923C" stroke-width="2.5" stroke-linecap="round"/>
                     </svg>
                     <span class="text-xl font-bold">CoDelivery</span>
@@ -69,10 +65,10 @@
                     <a href="{{ route('livreur.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Tableau de bord</a>
                     <a href="{{ route('livreur.commands') }}" class="text-white hover:text-orange-300 transition-colors">Commandes</a>
                     <a href="{{ route('livreur.historique') }}" class="text-white hover:text-orange-300 transition-colors">Historique</a>
+                    <a href="{{ route('livreur.reviews') }}" class="text-white hover:text-orange-300 transition-colors">Évaluations</a>
                     
-                    <!-- User Profile -->
-                    <div class="relative">
-                        <button class="flex items-center space-x-2 focus:outline-none">
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
                             <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
                                 <span class="font-semibold text-sm">{{ substr(Auth::user()->first_name, 0, 1) }}{{ substr(Auth::user()->last_name, 0, 1) }}</span>
                             </div>
@@ -81,22 +77,52 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
+                        
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50" style="display: none;">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        Se déconnecter
+                                    </div>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Mobile menu button -->
                 <div class="md:hidden">
-                    <button class="text-white">
+                    <button class="text-white" x-data="{ open: false }" @click="open = !open">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
+                        
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50" style="display: none;">
+                            <a href="{{ route('livreur.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">Tableau de bord</a>
+                            <a href="{{ route('livreur.commands') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">Commandes</a>
+                            <a href="{{ route('livreur.historique') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">Historique</a>
+                            <a href="{{ route('livreur.reviews') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">Évaluations</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-100">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        Se déconnecter
+                                    </div>
+                                </button>
+                            </form>
+                        </div>
                     </button>
                 </div>
             </div>
         </div>
     </header>
     
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         @if(session('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -110,7 +136,6 @@
         </div>
         @endif
         
-        <!-- Status and Earnings Banner -->
         <div class="mb-8 bg-gradient-to-r from-orange-600 to-orange-800 rounded-2xl p-8 text-white">
             <div class="md:flex items-center justify-between">
                 <div class="mb-6 md:mb-0">
@@ -135,7 +160,6 @@
             </div>
         </div>
         
-        <!-- Current Delivery -->
         @if($currentCommand)
         <div class="mb-8 bg-white rounded-xl p-6 shadow-sm border-l-4 {{ $currentCommand->status == 'accepted' ? 'border-blue-500' : 'border-green-500' }}">
             <div class="flex justify-between items-center mb-4">
@@ -167,7 +191,6 @@
                         </div>
                     </div>
                     
-                    <!-- Progress Steps -->
                     <div class="flex items-center space-x-2 mt-4">
                         <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                             <i class="fa-solid fa-check text-green-600"></i>
@@ -217,7 +240,6 @@
                 </div>
             </div>
             
-            <!-- Delivery Details -->
             <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-gray-50 rounded-lg p-4">
                     <h3 class="font-medium mb-3 flex items-center">
@@ -272,7 +294,6 @@
         @endif
         
    
-        <!-- Recent Deliveries -->
         <div>
             <h2 class="text-xl font-semibold mb-4">Livraisons récentes</h2>
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -352,7 +373,6 @@
     </main>
 
     
-    <!-- Footer -->
     <footer class="bg-gray-100 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="md:flex md:items-center md:justify-between">

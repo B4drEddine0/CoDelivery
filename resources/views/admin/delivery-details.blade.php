@@ -9,7 +9,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-gray-100">
-    <!-- Sidebar -->
     <div class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-orange-800 to-orange-950 text-white transition-all duration-300 transform z-30">
         <div class="flex items-center justify-center h-16 border-b border-gray-700">
             <h2 class="text-2xl font-bold">Codelivery</h2>
@@ -19,19 +18,19 @@
                 <span class="text-xs text-gray-400 uppercase tracking-wider">Main</span>
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 {{ request()->routeIs('admin.dashboard') ? 'bg-orange-700 text-white' : 'hover:bg-gray-700' }} rounded-lg transition-colors duration-200">
                     <i class="fas fa-tachometer-alt mr-3"></i>
-                    <span>Dashboard</span>
+                    <span>Tableau de Bord</span>
                 </a>
                 <a href="{{ route('admin.users') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 {{ request()->routeIs('admin.users*') ? 'bg-orange-700 text-white' : 'hover:bg-gray-700' }} rounded-lg transition-colors duration-200">
                     <i class="fas fa-users mr-3"></i>
-                    <span>Users</span>
+                    <span>Utilisateurs</span>
                 </a>
                 <a href="{{ route('admin.drivers') }}" class="flex items-center px-4 py-3 mt-2 text-gray-300 {{ request()->routeIs('admin.drivers*') ? 'bg-orange-700 text-white' : 'hover:bg-gray-700' }} rounded-lg transition-colors duration-200">
                     <i class="fas fa-car mr-3"></i>
-                    <span>Drivers</span>
+                    <span>Chauffeurs</span>
                 </a>
                 <a href="{{ route('admin.deliveries') }}" class="flex items-center px-4 py-3 mt-2 text-white {{ request()->routeIs('admin.deliveries*') ? 'bg-orange-700' : 'hover:bg-gray-700' }} rounded-lg transition-colors duration-200">
                     <i class="fas fa-box mr-3"></i>
-                    <span>Deliveries</span>
+                    <span>Livraisons</span>
                 </a>
             </div>
             <div class="px-4 mt-8">
@@ -46,7 +45,6 @@
         </nav>
     </div>
 
-    <!-- Main Content -->
     <div class="ml-64 p-6">
         @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -60,7 +58,6 @@
             </div>
         @endif
         
-        <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center">
                 <a href="{{ route('admin.deliveries') }}" class="mr-2 p-2 bg-gray-200 hover:bg-gray-300 rounded-full">
@@ -76,7 +73,6 @@
             </div>
         </div>
 
-        <!-- Delivery Status Card -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
@@ -118,12 +114,10 @@
                 </span>
             </div>
 
-            <!-- Timeline -->
             <div class="mt-8">
                 <div class="relative">
                     <div class="absolute left-0 inset-y-0 w-0.5 bg-gray-200"></div>
                     
-                    <!-- Order Placed -->
                     <div class="relative flex items-start mb-6">
                         <div class="flex items-center h-6">
                             <div class="relative z-10 w-6 h-6 flex items-center justify-center bg-orange-500 rounded-full">
@@ -137,7 +131,6 @@
                         </div>
                     </div>
                     
-                    <!-- Order Accepted -->
                     <div class="relative flex items-start mb-6">
                         <div class="flex items-center h-6">
                             <div class="relative z-10 w-6 h-6 flex items-center justify-center {{ in_array($command->status, ['accepted', 'in_progress', 'delivered']) ? 'bg-orange-500' : 'bg-gray-200' }} rounded-full">
@@ -157,7 +150,6 @@
                         </div>
                     </div>
                     
-                    <!-- In Progress -->
                     <div class="relative flex items-start mb-6">
                         <div class="flex items-center h-6">
                             <div class="relative z-10 w-6 h-6 flex items-center justify-center {{ in_array($command->status, ['in_progress', 'delivered']) ? 'bg-orange-500' : 'bg-gray-200' }} rounded-full">
@@ -177,7 +169,6 @@
                         </div>
                     </div>
                     
-                    <!-- Delivered -->
                     <div class="relative flex items-start">
                         <div class="flex items-center h-6">
                             <div class="relative z-10 w-6 h-6 flex items-center justify-center {{ $command->status == 'delivered' ? 'bg-green-500' : 'bg-gray-200' }} rounded-full">
@@ -201,7 +192,6 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Delivery Details -->
             <div class="col-span-1 md:col-span-2">
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h3 class="text-lg font-semibold text-orange-900 mb-4">Delivery Information</h3>
@@ -228,7 +218,7 @@
                         <div>
                             <div class="mb-4">
                                 <span class="text-sm text-gray-500">Order Notes</span>
-                                <p class="font-medium">{{ $command->instructions ?? 'No special instructions' }}</p>
+                                <p class="font-medium">{{ $command->description ?? 'No special instructions' }}</p>
                             </div>
                             <div class="mb-4">
                                 <span class="text-sm text-gray-500">Status</span>
@@ -244,7 +234,6 @@
                     </div>
                 </div>
 
-                <!-- Map -->
                 @if($command->latitude && $command->longitude)
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h3 class="text-lg font-semibold text-orange-900 mb-4">Delivery Location</h3>
@@ -253,9 +242,7 @@
                 @endif
             </div>
 
-            <!-- Customer and Driver Info -->
             <div class="col-span-1">
-                <!-- Customer -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h3 class="text-lg font-semibold text-orange-900 mb-4">Customer</h3>
                     @if($command->client)
@@ -279,7 +266,6 @@
                     @endif
                 </div>
 
-                <!-- Driver -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h3 class="text-lg font-semibold text-orange-900 mb-4">Driver</h3>
                     @if($command->livreur)
@@ -303,55 +289,11 @@
                     @endif
                 </div>
 
-                <!-- Actions -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-semibold text-orange-900 mb-4">Actions</h3>
-                    <button onclick="confirmDeleteDelivery({{ $command->id }})" class="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded flex items-center justify-center">
-                        <i class="fas fa-trash mr-2"></i> Delete Delivery
-                    </button>
-                </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Delete Delivery Form (Hidden) -->
-    <form id="deleteDeliveryForm" method="POST" style="display: none;">
-        @csrf
-        @method('DELETE')
-    </form>
-
-    <!-- JavaScript -->
-    <script>
-        function confirmDeleteDelivery(id) {
-            if (confirm("Are you sure you want to delete this delivery? This action cannot be undone.")) {
-                const form = document.getElementById('deleteDeliveryForm');
-                form.action = "{{ route('admin.deliveries.delete', ':command') }}".replace(':command', id);
-                form.submit();
-            }
-        }
-    </script>
-
-    @if($command->latitude && $command->longitude)
-    <!-- MapBox Scripts -->
-    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            mapboxgl.accessToken = 'pk.eyJ1IjoiY29kZWxpdmVyeSIsImEiOiJjbHRuNnNtY3YwODM2MmpvNzNhdGY4bHhyIn0.KrcuT-2e7DJFcPh1huwaDA';
-            
-            const map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/streets-v12',
-                center: [{{ $command->longitude }}, {{ $command->latitude }}],
-                zoom: 15
-            });
-            
-            // Add marker
-            new mapboxgl.Marker({ color: '#FF6B35' })
-                .setLngLat([{{ $command->longitude }}, {{ $command->latitude }}])
-                .addTo(map);
-        });
-    </script>
-    @endif
+   
 </body>
 </html>

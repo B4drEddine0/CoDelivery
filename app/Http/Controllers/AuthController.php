@@ -10,28 +10,20 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    /**
-     * Show the registration form.
-     *
-     * @return \Illuminate\View\View
-     */
+    
     public function showRegistrationForm()
     {
         return view('auth.inscriptions');
     }
 
-    /**
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'first-name' => 'required|string|max:255',
             'last-name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|string|max:20',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:client,courier',
         ]);
@@ -42,7 +34,7 @@ class AuthController extends Controller
                 ->withInput();
         }
 
-        // Map 'courier' value from form to 'livreur' in database
+        // insert 'livreur' in db
         $role = $request->input('role') === 'courier' ? 'livreur' : $request->input('role');
 
         $user = User::create([
@@ -64,20 +56,13 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     *
-     * @return \Illuminate\View\View
-     */
+    
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    /**
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -103,11 +88,7 @@ class AuthController extends Controller
         ])->withInput($request->except('password'));
     }
 
-    /**
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function logout(Request $request)
     {
         Auth::logout();

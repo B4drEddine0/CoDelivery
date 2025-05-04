@@ -20,7 +20,6 @@ class TrackingController extends Controller
         }
         $address = $request->input('address');
         $mapboxToken = config('services.mapbox.public_token');
-        // Use Mapbox Geocoding API
         $url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" . urlencode($address) . ".json?access_token=" . $mapboxToken . "&limit=1";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -30,7 +29,7 @@ class TrackingController extends Controller
         $data = json_decode($response, true);
         if (isset($data['features']) && count($data['features']) > 0) {
             $feature = $data['features'][0];
-            $coordinates = $feature['center']; // [longitude, latitude]
+            $coordinates = $feature['center']; 
             return response()->json([
                 'success' => true,
                 'coordinates' => [
@@ -40,7 +39,6 @@ class TrackingController extends Controller
                 'place_name' => $feature['place_name'],
             ]);
         }
-        // Fallback to default coordinates (Morocco)
         return response()->json([
             'success' => false,
             'coordinates' => [
@@ -51,62 +49,10 @@ class TrackingController extends Controller
         ]);
     }
 
-    /**
-     * Update client or livreur location for a specific command.
-     */
-    public function updateLocation(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'command_id' => 'required|exists:commands,id',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'type' => 'required|in:client,livreur',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
-        }
-
-        $commandId = $request->input('command_id');
-        $latitude = $request->input('latitude');
-        $longitude = $request->input('longitude');
-        $type = $request->input('type');
-        $user = Auth::user();
-
-        $command = Command::findOrFail($commandId);
-
-        // Check if user has permission to update this command's location
-        if (($type === 'client' && $command->client_id !== $user->id) || 
-            ($type === 'livreur' && $command->livreur_id !== $user->id)) {
-            return response()->json(['error' => 'Unauthorized access'], 403);
-        }
-
-        // Update the appropriate location
-        if ($type === 'client') {
-            $command->update([
-                'client_latitude' => $latitude,
-                'client_longitude' => $longitude,
-                'client_location_updated_at' => now(),
-            ]);
-        } else {
-            $command->update([
-                'livreur_latitude' => $latitude,
-                'livreur_longitude' => $longitude,
-                'livreur_location_updated_at' => now(),
-            ]);
-        }
-
-        return response()->json(['success' => true, 'message' => 'Location updated successfully']);
-    }
-
-    /**
-     * Get the current location data for a command.
-     */
     public function getLocationData(Request $request, Command $command)
     {
         $user = Auth::user();
 
-        // Security check: Only the client who created the command or the livreur assigned to it can access location data
         if ($user->id !== $command->client_id && $user->id !== $command->livreur_id) {
             return response()->json(['error' => 'Unauthorized access'], 403);
         }
@@ -140,14 +86,11 @@ class TrackingController extends Controller
         ]);
     }
 
-    /**
-     * Display the tracking view for a specific command.
-     */
+
     public function showTrackingView(Command $command)
     {
         $user = Auth::user();
 
-        // Security check
         if ($user->id !== $command->client_id && $user->id !== $command->livreur_id) {
             return redirect()->route('dashboard')->with('error', 'Vous n\'êtes pas autorisé à accéder à cette page.');
         }

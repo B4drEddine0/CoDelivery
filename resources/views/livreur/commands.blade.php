@@ -44,7 +44,7 @@
             scrollbar-width: none;
         }
         
-        /* List view styles */
+        
         .command-grid.list-view {
             grid-template-columns: 1fr !important;
         }
@@ -91,20 +91,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="bg-gray-50">
-    <!-- Header -->
     <header class="bg-gradient-to-r from-orange-800 to-orange-950 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-2">
                     <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Location Pin -->
                         <path d="M32 4c-11 0-20 9-20 20 0 11 20 36 20 36s20-25 20-36c0-11-9-20-20-20z" fill="#EA580C"/>
-                        <!-- Inner Circle -->
                         <circle cx="32" cy="24" r="12" fill="#FB923C"/>
-                        <!-- Package Icon -->
                         <rect x="24" y="18" width="16" height="12" fill="#FFFFFF"/>
                         <path d="M24 22h16M32 18v12" stroke="#EA580C" stroke-width="1.5"/>
-                        <!-- Motion Lines -->
                         <path d="M14 44l-6 6M50 44l6 6" stroke="#FB923C" stroke-width="2.5" stroke-linecap="round"/>
                     </svg>
                     <span class="text-xl font-bold">CoDelivery</span>
@@ -114,8 +109,9 @@
                     <a href="{{ route('livreur.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Tableau de bord</a>
                     <a href="{{ route('livreur.commands') }}" class="text-white hover:text-orange-300 transition-colors border-b-2 border-orange-500 pb-1">Commandes disponibles</a>
                     <a href="{{ route('livreur.historique') }}" class="text-white hover:text-orange-300 transition-colors">Historique</a>
+                    <a href="{{ route('livreur.reviews') }}" class="text-white hover:text-orange-300 transition-colors ">Évaluations</a>
+
                     
-                    <!-- User Profile -->
                     <div class="relative">
                         <button class="flex items-center space-x-2 focus:outline-none">
                             <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
@@ -125,7 +121,6 @@
                     </div>
                 </div>
                 
-                <!-- Mobile menu button -->
                 <div class="md:hidden">
                     <button class="text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +132,6 @@
         </div>
     </header>
     
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         @if(session('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -151,7 +145,6 @@
         </div>
         @endif
 
-        <!-- Page Title and Filter -->
         <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="mb-4 md:mb-0">
                 <h1 class="text-2xl font-bold text-gray-800">Commandes disponibles</h1>
@@ -159,7 +152,6 @@
             </div>
             
             <form action="{{ route('livreur.commands') }}" method="GET" class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                <!-- Type Filter -->
                 <div class="relative">
                     <select name="service_type" class="appearance-none bg-white border border-gray-300 rounded-lg py-2 px-4 pr-8 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                         <option value="">Tous les types</option>
@@ -175,7 +167,6 @@
                     </div>
                 </div>
                 
-                <!-- Priority Filter -->
                 <div class="relative">
                     <select name="priority" class="appearance-none bg-white border border-gray-300 rounded-lg py-2 px-4 pr-8 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                         <option value="">Toutes priorités</option>
@@ -203,7 +194,6 @@
         </div>
         
       
-        <!-- My Current Commands Section -->
         @if($myCommands->count() > 0)
         <div class="mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-4">Mes commandes en cours</h2>
@@ -291,12 +281,10 @@
         </div>
         @endif
         
-        <!-- Available Orders Section -->
         <div class="mb-12">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Commandes disponibles <span class="text-orange-600">({{ $availableCommands->count() }})</span></h2>
                 
-                <!-- View toggle buttons -->
                 <div class="hidden sm:flex space-x-2 bg-gray-100 p-1 rounded-lg">
                     <button id="grid-view-btn" class="view-toggle-btn bg-white text-gray-700 px-3 py-1 rounded-md shadow-sm">
                         <i class="fa-solid fa-grip text-orange-600 mr-1"></i> Grille
@@ -311,7 +299,6 @@
                 @forelse($availableCommands as $command)
                 <div class="command-card bg-white rounded-xl shadow-sm overflow-hidden border-l-4 {{ $command->priority == 'high' ? 'border-red-500' : 'border-orange-500' }} hover:shadow-md transition-all duration-200 transform hover:-translate-y-1">
                     <div class="command-card-content p-6">
-                        <!-- Command Header -->
                         <div class="command-header flex justify-between items-start mb-5">
                             <div class="flex items-center">
                                 <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3 shadow-sm">
@@ -335,10 +322,8 @@
                             </span>
                         </div>
                         
-                        <!-- Divider -->
                         <div class="command-divider border-t border-gray-100 -mx-6 mb-5"></div>
                         
-                        <!-- Command Details -->
                         <div class="command-details space-y-4 mb-5">
                             <div class="flex items-start">
                                 <div class="bg-orange-50 p-2 rounded-lg mr-3">
@@ -361,10 +346,8 @@
                             </div>
                         </div>
                         
-                        <!-- Divider -->
                         <div class="command-divider border-t border-gray-100 -mx-6 mb-5"></div>
                         
-                        <!-- Command Footer -->
                         <div class="command-footer flex justify-between items-center">
                             <div>
                                 <p class="text-sm text-gray-500">Prix de livraison</p>
@@ -401,7 +384,6 @@
             </div>
             
             @if($availableCommands->count() > 9)
-            <!-- Load More Button -->
             <div class="mt-6 text-center">
                 <button class="bg-white border border-gray-300 rounded-lg py-2 px-4 text-gray-700 hover:bg-gray-50 transition-colors">
                     Voir plus de commandes
@@ -412,7 +394,6 @@
         </div>
     </main>
     
-    <!-- Footer -->
     <footer class="bg-gray-100 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="md:flex md:items-center md:justify-between">
@@ -439,30 +420,21 @@
         </div>
     </footer>
     
-    <!-- Chat Button -->
-    <div class="fixed bottom-6 right-6">
-        <button class="bg-orange-600 hover:bg-orange-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-colors">
-            <i class="fa-solid fa-headset text-xl"></i>
-        </button>
-    </div>
-    <!-- View Toggle Script -->
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const gridViewBtn = document.getElementById('grid-view-btn');
             const listViewBtn = document.getElementById('list-view-btn');
             const commandGrid = document.getElementById('command-grid');
             
-            // Function to save view preference to localStorage
             function saveViewPreference(view) {
                 localStorage.setItem('commandViewPreference', view);
             }
             
-            // Function to load view preference from localStorage
             function loadViewPreference() {
                 return localStorage.getItem('commandViewPreference') || 'grid';
             }
             
-            // Function to set grid view
             function setGridView() {
                 commandGrid.classList.remove('list-view');
                 gridViewBtn.classList.add('bg-white', 'text-gray-700', 'shadow-sm');
@@ -470,7 +442,6 @@
                 listViewBtn.classList.remove('bg-white', 'text-gray-700', 'shadow-sm');
                 listViewBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
                 
-                // Update icons
                 gridViewBtn.querySelector('i').classList.add('text-orange-600');
                 gridViewBtn.querySelector('i').classList.remove('text-gray-400');
                 listViewBtn.querySelector('i').classList.remove('text-orange-600');
@@ -479,7 +450,6 @@
                 saveViewPreference('grid');
             }
             
-            // Function to set list view
             function setListView() {
                 commandGrid.classList.add('list-view');
                 listViewBtn.classList.add('bg-white', 'text-gray-700', 'shadow-sm');
@@ -487,7 +457,6 @@
                 gridViewBtn.classList.remove('bg-white', 'text-gray-700', 'shadow-sm');
                 gridViewBtn.classList.add('text-gray-600', 'hover:bg-gray-50');
                 
-                // Update icons
                 listViewBtn.querySelector('i').classList.add('text-orange-600');
                 listViewBtn.querySelector('i').classList.remove('text-gray-400');
                 gridViewBtn.querySelector('i').classList.remove('text-orange-600');
@@ -496,7 +465,6 @@
                 saveViewPreference('list');
             }
             
-            // Set initial view based on saved preference
             const initialView = loadViewPreference();
             if (initialView === 'list') {
                 setListView();
@@ -504,7 +472,6 @@
                 setGridView();
             }
             
-            // Add event listeners to buttons
             gridViewBtn.addEventListener('click', setGridView);
             listViewBtn.addEventListener('click', setListView);
         });

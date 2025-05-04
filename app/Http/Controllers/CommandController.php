@@ -63,7 +63,6 @@ class CommandController extends Controller
                 ->withInput();
         }
 
-        // Extract coordinates from pickup_coordinates field
         $pickup_lat = null;
         $pickup_lng = null;
         if ($request->pickup_coordinates) {
@@ -74,7 +73,6 @@ class CommandController extends Controller
             }
         }
         
-        // Extract coordinates from delivery_coordinates field
         $delivery_lat = null;
         $delivery_lng = null;
         if ($request->delivery_coordinates) {
@@ -135,7 +133,6 @@ class CommandController extends Controller
                 ->with('error', 'Cette commande a déjà été prise en charge ou n\'est plus disponible.');
         }
         
-        // Check if the livreur already has an active command
         $activeCommand = $user->livreurCommands()
             ->whereIn('status', ['accepted', 'in_progress'])
             ->first();
@@ -253,27 +250,18 @@ class CommandController extends Controller
             ->with('error', 'Vous n\'êtes pas autorisé à annuler cette commande.');
     }
 
-    /**
-     * Handle updates to a command, including the "Continue to iterate" action.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Command  $command
-     * @return \Illuminate\Http\Response
-     */
+    
     public function update(Request $request, Command $command)
     {
         $user = Auth::user();
         
-        // Check if the user is authorized to update this command
         if (!($user->isClient() && $command->client_id == $user->id) && 
             !($user->isLivreur() && $command->livreur_id == $user->id)) {
             return redirect()->route('dashboard')
                 ->with('error', 'Vous n\'êtes pas autorisé à modifier cette commande.');
         }
         
-        // Handle "continue_iteration" action
         if ($request->input('action') === 'continue_iteration') {
-            // Reset the command to pending state
             $command->update([
                 'status' => 'pending',
                 'livreur_id' => null,
@@ -285,23 +273,17 @@ class CommandController extends Controller
                 ->with('success', 'La commande a été remise en attente. Un nouveau livreur pourra la prendre en charge.');
         }
         
-        // Handle other update actions as needed
+      
         
         return redirect()->back()
             ->with('error', 'Action non reconnue.');
     }
     
-    /**
-     * Display the tracking view for a specific command.
-     * 
-     * @param Command $command
-     * @return \Illuminate\Http\Response
-     */
+   
     public function trackCommand(Command $command)
     {
         $user = Auth::user();
         
-        // Security check: Only the client who created the command or the assigned livreur can track it
         if ($user->id !== $command->client_id && $user->id !== $command->livreur_id) {
             return redirect()->route('dashboard')->with('error', 'Vous n\'êtes pas autorisé à suivre cette commande.');
         }
@@ -322,12 +304,7 @@ class CommandController extends Controller
         ]);
     }
     
-    /**
-     * Update the delivery coordinates of a command.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function updateDeliveryCoordinates(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -342,7 +319,6 @@ class CommandController extends Controller
 
         $command = Command::findOrFail($request->command_id);
         
-        // Update the command
         $command->update([
             'delivery_latitude' => $request->latitude,
             'delivery_longitude' => $request->longitude,

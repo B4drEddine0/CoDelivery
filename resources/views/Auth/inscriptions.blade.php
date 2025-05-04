@@ -90,7 +90,7 @@
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
                             <input type="tel" id="phone" name="phone" 
                                    class="w-full px-3 py-2 rounded-lg border @error('phone') border-red-500 @else border-gray-300 @enderror focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                   placeholder="+33 6 12 34 56 78" value="{{ old('phone') }}">
+                                   placeholder="+33 6 12 34 56 78" value="{{ old('phone') }}" required>
                             @error('phone')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror

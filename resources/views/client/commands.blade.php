@@ -21,18 +21,14 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Header -->
     <header class="bg-gradient-to-r from-orange-800 to-orange-950 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-2">
                     <a href="{{ route('client.dashboard') }}" class="flex items-center space-x-2">
                         <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Location Pin -->
                             <path d="M32 4c-11 0-20 9-20 20 0 11 20 36 20 36s20-25 20-36c0-11-9-20-20-20z" fill="#EA580C"/>
-                            <!-- Inner Circle -->
                             <circle cx="32" cy="24" r="12" fill="#FB923C"/>
-                            <!-- Package Icon -->
                             <rect x="24" y="18" width="16" height="12" fill="#FFFFFF"/>
                             <path d="M24 22h16M32 18v12" stroke="#EA580C" stroke-width="1.5"/>
                         </svg>
@@ -44,7 +40,6 @@
                     <a href="{{ route('client.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Home</a>
                     <a href="{{ route('client.commands') }}" class="text-white hover:text-orange-300 transition-colors border-b-2 border-orange-500 pb-1">Mes commandes</a>
                     
-                    <!-- User Profile -->
                     <div class="relative">
                         <button class="flex items-center space-x-2 focus:outline-none">
                             <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
@@ -54,7 +49,6 @@
                     </div>
                 </div>
                 
-                <!-- Mobile menu button -->
                 <div class="md:hidden">
                     <button class="text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,9 +60,7 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <!-- Page Header -->
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-2xl font-bold">Mes Commandes</h1>
             <a href="{{ route('client.commands.create') }}" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
@@ -79,7 +71,6 @@
             </a>
         </div>
         
-        <!-- Filters -->
         <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
             <form action="{{ route('client.commands') }}" method="GET" class="flex flex-col md:flex-row md:items-end space-y-4 md:space-y-0 md:space-x-4">
                 <div class="flex-1">
@@ -106,8 +97,7 @@
                 </div>
                 
                 <div class="flex-1">
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Rechercher</label>
-                    <input type="text" id="search" name="search" value="{{ request('search') }}" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Rechercher...">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1"></label>
                 </div>
                 
                 <div>
@@ -118,7 +108,6 @@
             </form>
         </div>
         
-        <!-- Commands List -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             @if($commands->count() > 0)
                 <div class="overflow-x-auto">
@@ -200,6 +189,12 @@
                                                 <button type="submit" class="text-red-600 hover:text-red-900">Annuler</button>
                                             </form>
                                         @endif
+
+                                        @if($command->status == 'delivered' && !$command->review)
+                                            <button onclick="openReviewModal({{ $command->id }}, '{{ $command->title }}')" class="text-green-600 hover:text-green-900 ml-3">
+                                                <i class="fa-solid fa-star mr-1"></i> Évaluer
+                                            </button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -207,7 +202,6 @@
                     </table>
                 </div>
                 
-                <!-- Pagination -->
                 <div class="px-6 py-4 border-t border-gray-200">
                     {{ $commands->links() }}
                 </div>
@@ -229,17 +223,53 @@
         </div>
     </main>
     
-    <!-- Footer -->
+    <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg max-w-lg w-full mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-900" id="reviewCommandTitle">Évaluer votre commande</h3>
+                    <button onclick="closeReviewModal()" class="text-gray-400 hover:text-gray-500">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="reviewForm" action="{{ route('client.reviews.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="command_id" id="reviewCommandId">
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Note</label>
+                        <div class="flex items-center space-x-1" id="ratingStars">
+                            <button type="button" onclick="setRating(1)" class="text-2xl text-gray-300 hover:text-yellow-400 focus:outline-none">★</button>
+                            <button type="button" onclick="setRating(2)" class="text-2xl text-gray-300 hover:text-yellow-400 focus:outline-none">★</button>
+                            <button type="button" onclick="setRating(3)" class="text-2xl text-gray-300 hover:text-yellow-400 focus:outline-none">★</button>
+                            <button type="button" onclick="setRating(4)" class="text-2xl text-gray-300 hover:text-yellow-400 focus:outline-none">★</button>
+                            <button type="button" onclick="setRating(5)" class="text-2xl text-gray-300 hover:text-yellow-400 focus:outline-none">★</button>
+                        </div>
+                        <input type="hidden" name="rating" id="ratingInput" value="5">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Commentaire</label>
+                        <textarea id="comment" name="comment" rows="4" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Partagez votre expérience avec ce service..."></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="button" onclick="closeReviewModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg mr-2">Annuler</button>
+                        <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg">Soumettre</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <footer class="bg-gradient-to-r from-orange-800 to-orange-950 text-white py-8 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="flex justify-center md:justify-start">
                     <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Location Pin -->
                         <path d="M32 4c-11 0-20 9-20 20 0 11 20 36 20 36s20-25 20-36c0-11-9-20-20-20z" fill="#EA580C"/>
-                        <!-- Inner Circle -->
                         <circle cx="32" cy="24" r="12" fill="#FB923C"/>
-                        <!-- Package Icon -->
                         <rect x="24" y="18" width="16" height="12" fill="#FFFFFF"/>
                         <path d="M24 22h16M32 18v12" stroke="#EA580C" stroke-width="1.5"/>
                     </svg>
@@ -251,5 +281,36 @@
             </div>
         </div>
     </footer>
+    
+    <script>
+        let currentRating = 5;
+        
+        function openReviewModal(commandId, commandTitle) {
+            document.getElementById('reviewCommandId').value = commandId;
+            document.getElementById('reviewCommandTitle').textContent = 'Évaluer: ' + commandTitle;
+            document.getElementById('reviewModal').classList.remove('hidden');
+            setRating(5); 
+        }
+        
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.add('hidden');
+        }
+        
+        function setRating(rating) {
+            currentRating = rating;
+            document.getElementById('ratingInput').value = rating;
+            
+            const stars = document.getElementById('ratingStars').children;
+            for (let i = 0; i < stars.length; i++) {
+                if (i < rating) {
+                    stars[i].classList.remove('text-gray-300');
+                    stars[i].classList.add('text-yellow-400');
+                } else {
+                    stars[i].classList.remove('text-yellow-400');
+                    stars[i].classList.add('text-gray-300');
+                }
+            }
+        }
+    </script>
 </body>
 </html>

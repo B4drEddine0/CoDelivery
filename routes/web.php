@@ -11,6 +11,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/contact',function(){
+    return view('contact');
+});
+
 // Auth
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
@@ -18,7 +22,6 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Common route for both clients and livreurs
 Route::middleware('auth')->put('/commands/{command}', [CommandController::class, 'update'])->name('commands.update');
 
 Route::middleware('auth')->group(function () {
@@ -41,13 +44,12 @@ Route::middleware('auth')->group(function () {
             Route::post('/commands', [CommandController::class, 'store'])->name('commands.store');
             Route::get('/commands/{command}', [CommandController::class, 'show'])->name('commands.show');
             Route::post('/commands/{command}/cancel', [CommandController::class, 'cancel'])->name('commands.cancel');
-            Route::post('/store-location', [ClientController::class, 'storeLocation'])->name('store-location');
 
-            // Command tracking route
             Route::get('/commands/{command}/track', [TrackingController::class, 'showTrackingView'])->name('commands.track');
             
-            // Livreur contact info route
             Route::get('/commands/{command}/contact', [ClientController::class, 'getLivreurContact'])->name('commands.contact');
+
+            Route::post('/reviews', [App\Http\Controllers\Client\ReviewController::class, 'store'])->name('reviews.store');
         });
     });
     
@@ -56,6 +58,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/dashboard', [LivreurController::class, 'dashboard'])->name('dashboard');
             Route::get('/commands', [LivreurController::class, 'commands'])->name('commands');
             Route::get('/historique', [LivreurController::class, 'historique'])->name('historique');
+            Route::get('/reviews', [LivreurController::class, 'reviews'])->name('reviews');
             
             Route::get('/commands/{command}', [CommandController::class, 'show'])->name('commands.show');
             Route::post('/commands/{command}/accept', [CommandController::class, 'accept'])->name('commands.accept');
@@ -65,12 +68,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/commands/{command}/reset', [CommandController::class, 'reset'])->name('commands.reset');
             Route::post('/store-location', [LivreurController::class, 'storeLocation'])->name('store-location');
 
-            // Command tracking route
             Route::get('/commands/{command}/track', [TrackingController::class, 'showTrackingView'])->name('commands.track');
         });
     });
 
-    // Admin routes
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware(\App\Http\Middleware\AdminMiddleware::class)->group(function () {
             Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('dashboard');
@@ -81,7 +82,6 @@ Route::middleware('auth')->group(function () {
             Route::delete('/drivers/{user}', [App\Http\Controllers\AdminController::class, 'deleteUser'])->name('drivers.delete');
             Route::delete('/deliveries/{command}', [App\Http\Controllers\AdminController::class, 'deleteDelivery'])->name('deliveries.delete');
             
-            // Detail routes
             Route::get('/users/{user}', [App\Http\Controllers\AdminController::class, 'showUser'])->name('users.show');
             Route::get('/drivers/{user}', [App\Http\Controllers\AdminController::class, 'showDriver'])->name('drivers.show');
             Route::get('/deliveries/{command}', [App\Http\Controllers\AdminController::class, 'showDelivery'])->name('deliveries.show');

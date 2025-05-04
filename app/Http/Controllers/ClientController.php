@@ -48,11 +48,9 @@ class ClientController extends Controller
         
         if ($request->filled('search')) {
             $search = '%' . $request->search . '%';
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', $search)
-                  ->orWhere('establishment_name', 'like', $search)
-                  ->orWhere('delivery_address', 'like', $search);
-            });
+            $query->where('title', 'like', $search)
+            ->orWhere('establishment_name', 'like', $search)
+            ->orWhere('delivery_address', 'like', $search);
         }
         
         $commands = $query->paginate(10)->withQueryString();
@@ -62,22 +60,17 @@ class ClientController extends Controller
         ]);
     }
 
-    /**
-     * Get the delivery person's contact information
-     */
+   
     public function getLivreurContact(Command $command)
     {
-        // Check if the authenticated user is the client of this command
         if (Auth::id() !== $command->client_id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
         
-        // Check if the command has a delivery person assigned
         if (!$command->livreur_id) {
             return response()->json(['error' => 'No delivery person assigned yet'], 404);
         }
         
-        // Get the delivery person's contact info
         $livreur = $command->livreur;
         
         return response()->json([

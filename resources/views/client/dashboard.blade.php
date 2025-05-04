@@ -49,20 +49,15 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body class="bg-gray-50">
-    <!-- Header -->
     <header class="bg-gradient-to-r from-orange-800 to-orange-950 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-2">
                     <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Location Pin -->
                         <path d="M32 4c-11 0-20 9-20 20 0 11 20 36 20 36s20-25 20-36c0-11-9-20-20-20z" fill="#EA580C"/>
-                        <!-- Inner Circle -->
                         <circle cx="32" cy="24" r="12" fill="#FB923C"/>
-                        <!-- Package Icon -->
                         <rect x="24" y="18" width="16" height="12" fill="#FFFFFF"/>
                         <path d="M24 22h16M32 18v12" stroke="#EA580C" stroke-width="1.5"/>
-                        <!-- Motion Lines -->
                         <path d="M14 44l-6 6M50 44l6 6" stroke="#FB923C" stroke-width="2.5" stroke-linecap="round"/>
                     </svg>
                     <span class="text-xl font-bold">CoDelivery</span>
@@ -71,7 +66,6 @@
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('client.dashboard') }}" class="text-white hover:text-orange-300 transition-colors">Home</a>
                     <a href="{{ route('client.commands') }}" class="text-white hover:text-orange-300 transition-colors">Mes commandes</a>                    
-                     <!-- User Profile -->
                      <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
                             <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
@@ -83,7 +77,6 @@
                             </svg>
                         </button>
                         
-                        <!-- Dropdown Menu -->
                         <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50" style="display: none;">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -100,7 +93,6 @@
                     </div>
                 </div>
                 
-                <!-- Mobile menu button -->
                 <div class="md:hidden">
                     <button class="text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,9 +104,7 @@
         </div>
     </header>
     
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <!-- Welcome Banner -->
         <div class="mb-8 bg-gradient-to-r from-orange-600 to-orange-800 rounded-2xl p-8 text-white">
             <div class="md:flex items-center justify-between">
                 <div class="mb-4 md:mb-0">
@@ -130,11 +120,9 @@
             </div>
         </div>
         
-        <!-- Service Type Selection -->
         <div class="mb-8">
             <h2 class="text-xl font-semibold mb-4">Services disponibles</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <!-- Restaurant -->
                 <a href="{{ route('client.commands.create') }}">
                 <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition-all">
                     <div class="flex flex-col items-center">
@@ -146,7 +134,6 @@
                 </div>
                 </a>
                 
-                <!-- Pharmacy -->
                 <a href="{{ route('client.commands.create') }}">
                 <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition-all">
                     <div class="flex flex-col items-center">
@@ -158,7 +145,6 @@
                 </div>
                 </a>
                 
-                <!-- Market -->
                 <a href="{{ route('client.commands.create') }}">
                 <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition-all">
                     <div class="flex flex-col items-center">
@@ -172,7 +158,6 @@
                 </div>
                 </a>
                 
-                <!-- Package -->
                 <a href="{{ route('client.commands.create') }}">
                 <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition-all">
                     <div class="flex flex-col items-center">
@@ -188,7 +173,6 @@
             </div>
         </div>
         
-        <!-- Ongoing Order (if any) -->
         @if($ongoingCommand)
         <div class="mb-8 bg-white rounded-xl p-6 shadow-sm border-l-4 border-orange-500">
             <h2 class="text-xl font-semibold mb-4">Commande en cours</h2>
@@ -235,7 +219,6 @@
         @endif
         
         
-        <!-- Previous Orders -->
         <div>
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold">Commandes récentes</h2>
@@ -309,29 +292,14 @@
         </div>
     </main>
     
-    <!-- Chat Button (Fixed) -->
-    <div class="fixed bottom-8 right-8">
-        <button class="bg-orange-600 hover:bg-orange-700 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-colors">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-            </svg>
-        </button>
-        <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-            2
-        </span>
-    </div>
     
-    <!-- Footer with simplified version -->
     <footer class="bg-gradient-to-r from-orange-800 to-orange-950 text-white py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="flex items-center space-x-2 mb-4 md:mb-0">
                     <svg class="w-10 h-10" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Location Pin -->
                         <path d="M32 4c-11 0-20 9-20 20 0 11 20 36 20 36s20-25 20-36c0-11-9-20-20-20z" fill="#EA580C"/>
-                        <!-- Inner Circle -->
                         <circle cx="32" cy="24" r="12" fill="#FB923C"/>
-                        <!-- Package Icon -->
                         <rect x="24" y="18" width="16" height="12" fill="#FFFFFF"/>
                         <path d="M24 22h16M32 18v12" stroke="#EA580C" stroke-width="1.5"/>
                     </svg>
@@ -355,7 +323,6 @@
                 method: 'GET',
                 success: function(response) {
                     if (response.success) {
-                        // Create a modal to display the contact info
                         const modal = document.createElement('div');
                         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
                         modal.innerHTML = `

@@ -38,28 +38,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
-    <!-- Location Permission System -->
     <script src="/js/location-permission.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <!-- Force location permission system to show on login -->
-    <script>
+        <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Clear any previous location permissions to force the popup to show again
             sessionStorage.removeItem('locationPermissionHandled');
             sessionStorage.removeItem('locationVerified');
             localStorage.removeItem('userLocation');
             localStorage.removeItem('userCity');
             
-            // Initialize the location permission system with forceShow=true
             setTimeout(function() {
                 if (!window.locationSystem) {
                     window.locationSystem = new LocationPermissionSystem();
-                    window.locationSystem.init(true); // Force showing the popup
+                    window.locationSystem.init(true);
                 } else {
-                    window.locationSystem.init(true); // Force showing the popup
+                    window.locationSystem.init(true);
                 }
-            }, 1000); // Short delay to ensure the login form is visible first
+            }, 1000);
         });
     </script>
     <section class="py-10 w-full">

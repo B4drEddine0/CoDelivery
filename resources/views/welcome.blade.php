@@ -49,28 +49,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="bg-white">
-    <!-- Header -->
-
-
-    <!-- Hero Section -->
     <div class="relative h-screen overflow-hidden bg-gradient-to-t from-orange-950 via-orange-900 to-orange-950/100">
-       
-
-        <!-- Main Content -->
         <div class="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Navigation -->
             <nav class="py-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
                         <svg class="w-12 h-12" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Location Pin -->
                             <path d="M32 4c-11 0-20 9-20 20 0 11 20 36 20 36s20-25 20-36c0-11-9-20-20-20z" fill="#EA580C"/>
-                            <!-- Inner Circle -->
                             <circle cx="32" cy="24" r="12" fill="#FB923C"/>
-                            <!-- Package Icon -->
                             <rect x="24" y="18" width="16" height="12" fill="#FFFFFF"/>
                             <path d="M24 22h16M32 18v12" stroke="#EA580C" stroke-width="1.5"/>
-                            <!-- Motion Lines -->
                             <path d="M14 44l-6 6M50 44l6 6" stroke="#FB923C" stroke-width="2.5" stroke-linecap="round"/>
                         </svg>
                         <span class="text-2xl font-bold text-white">CoDelivery</span>
@@ -78,7 +66,7 @@
                     <div class="hidden md:flex items-center space-x-8">
                         <a href="#services" class="text-white hover:text-orange-300 transition-colors">Services</a>
                         <a href="#how-it-works" class="text-white hover:text-orange-300 transition-colors">Comment ça marche</a>
-                        <a href="contact.html" class="text-white hover:text-orange-300 transition-colors">Contact</a>
+                        <a href="contact" class="text-white hover:text-orange-300 transition-colors">Contact</a>
                         <a href="login">
                         <button class="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full transition-all">
                             Connexion
@@ -88,10 +76,8 @@
                 </div>
             </nav>
 
-            <!-- Hero Content -->
             <div class="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
                
-                <!-- Centered Content -->
                 <div class="text-white text-center z-10 max-w-3xl mx-auto">
                     <h1 class="text-5xl text-white md:text-7xl font-bold mb-6 leading-tight">
                         Votre livraison,<br/>
@@ -99,7 +85,6 @@
                     </h1>
                     <p class="text-xl mb-8 text-gray-300">Livraison rapide et fiable, partout dans votre ville</p>
                     
-                    <!-- Modern Search Bar -->
                     <div class="relative max-w-xl mx-auto">
                         <div class="flex items-center p-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
                             <svg class="w-6 h-6 text-orange-500 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,12 +108,10 @@
         </div>
     </div>
 
-    <!-- Services Section -->
     <section id="services" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl font-bold text-center mb-16">Nous livrons de partout</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <!-- Restaurant -->
                 <div class="group">
                     <div class="bg-orange-50 rounded-2xl p-8 text-center transform transition-all hover:scale-105 hover:shadow-xl">
                         <div class="w-20 h-20 mx-auto mb-6 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-500">
@@ -139,7 +122,6 @@
                     </div>
                 </div>
 
-                <!-- Pharmacy -->
                 <div class="group">
                     <div class="bg-orange-50 rounded-2xl p-8 text-center transform transition-all hover:scale-105 hover:shadow-xl">
                         <div class="w-20 h-20 mx-auto mb-6 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-500">
@@ -150,7 +132,6 @@
                     </div>
                 </div>
 
-                <!-- Market -->
                 <div class="group">
                     <div class="bg-orange-50 rounded-2xl p-8 text-center transform transition-all hover:scale-105 hover:shadow-xl">
                         <div class="w-20 h-20 mx-auto mb-6 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-500">
@@ -163,7 +144,6 @@
                     </div>
                 </div>
 
-                <!-- Package -->
                 <div class="group">
                     <div class="bg-orange-50 rounded-2xl p-8 text-center transform transition-all hover:scale-105 hover:shadow-xl">
                         <div class="w-20 h-20 mx-auto mb-6 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-500">
@@ -179,7 +159,6 @@
         </div>
     </section>
 
-    <!-- Map Section -->
     <section class="py-20 bg-orange-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -187,7 +166,6 @@
                     <h2 class="text-4xl font-bold mb-6">Suivez votre livraison en temps réel</h2>
                     <p class="text-lg text-gray-600 mb-8">Notre système intelligent vous permet de suivre votre commande en direct et de connaître le temps estimé de livraison.</p>
                     
-                    <!-- Features List -->
                     <div class="space-y-4">
                         <div class="flex items-center space-x-4 bg-white p-4 rounded-xl shadow-sm">
                             <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
@@ -227,24 +205,20 @@
                     </div>
                 </div>
 
-                <!-- Map Preview -->
                 <div class="relative">
                     <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-orange-600 transform rotate-3 rounded-2xl"></div>
                     <div class="relative bg-white p-4 rounded-2xl shadow-xl">
-                        <!-- Map Image with Animation -->
                         <div class="relative rounded-xl overflow-hidden">
                             <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-s+ea580c(2.3522,48.8566)/2.3522,48.8566,13/600x400@2x?access_token=pk.eyJ1IjoiYmFkcmVkZGluZTAwIiwiYSI6ImNsdzJ0cDJ1bTBtMnQyaW11NjBxczE3Z2kifQ.ockRcbgDpqVyMLsAv_tMgw" 
                                  alt="Live Tracking Map" 
                                  class="w-full h-[400px] object-cover rounded-xl"
                             >
-                            <!-- Animated Delivery Marker -->
                             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                                 <div class="w-6 h-6 bg-orange-500 rounded-full animate-ping"></div>
                                 <div class="w-6 h-6 bg-orange-500 rounded-full absolute top-0"></div>
                             </div>
                         </div>
 
-                        <!-- Status Card -->
                         <div class="absolute bottom-8 left-8 bg-white p-4 rounded-xl shadow-lg">
                             <div class="flex items-center space-x-3">
                                 <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -264,16 +238,13 @@
         </div>
     </section>
 
-    <!-- How it Works Section -->
     <section id="how-it-works" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl font-bold text-center mb-16">Comment ça marche</h2>
             <div class="relative">
-                <!-- Connection Line -->
                 <div class="absolute top-1/2 left-0 w-full h-1 bg-orange-200 transform -translate-y-1/2 hidden md:block"></div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-                    <!-- Step 1 -->
                     <div class="relative bg-white p-6 rounded-xl">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <span class="text-3xl font-bold text-orange-500">1</span>
@@ -285,7 +256,6 @@
                         </svg>
                     </div>
 
-                    <!-- Step 2 -->
                     <div class="relative bg-white p-6 rounded-xl">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <span class="text-3xl font-bold text-orange-500">2</span>
@@ -298,7 +268,6 @@
                         </svg>
                     </div>
 
-                    <!-- Step 3 -->
                     <div class="relative bg-white p-6 rounded-xl">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <span class="text-3xl font-bold text-orange-500">3</span>
@@ -310,7 +279,6 @@
                         </svg>
                     </div>
 
-                    <!-- Step 4 -->
                     <div class="relative bg-white p-6 rounded-xl">
                         <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <span class="text-3xl font-bold text-orange-500">4</span>
@@ -326,7 +294,6 @@
         </div>
     </section>
 
-    <!-- Support Chat Section -->
     <section class="py-20 bg-orange-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -334,7 +301,6 @@
                     <h2 class="text-4xl font-bold mb-6">Support 24/7 à votre service</h2>
                     <p class="text-lg text-gray-600 mb-8">Notre équipe de support et nos livreurs sont toujours là pour vous assister</p>
                     
-                    <!-- Features List -->
                     <div class="space-y-6">
                         <div class="flex items-center space-x-4">
                             <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -364,16 +330,13 @@
                         </div>
                     </div>
 
-                    <!-- CTA Button -->
                     <button class="mt-8 px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-all">
                         Contacter le support
                     </button>
                 </div>
 
-                <!-- Chat Interface -->
                 <div class="relative">
                     <div class="bg-white rounded-2xl shadow-xl p-6 max-w-sm mx-auto">
-                        <!-- Chat Header -->
                         <div class="flex items-center space-x-4 mb-6">
                             <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                                 <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,7 +349,6 @@
                             </div>
                         </div>
 
-                        <!-- Chat Messages -->
                         <div class="space-y-4 mb-4">
                             <div class="flex items-start space-x-3">
                                 <div class="bg-orange-100 rounded-lg p-3 max-w-[80%]">
@@ -405,7 +367,6 @@
                             </div>
                         </div>
 
-                        <!-- Chat Input -->
                         <div class="flex items-center space-x-2">
                             <input type="text" 
                                    placeholder="Écrivez votre message..." 
@@ -423,30 +384,22 @@
         </div>
     </section>
 
-    <!-- Footer Section -->
     <footer class="bg-orange-950 text-white">
-        <!-- Main Footer -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-                <!-- Company Info -->
                 <div class="space-y-6">
                     <div class="flex items-center space-x-2">
                        <svg class="w-12 h-12" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Location Pin -->
                             <path d="M32 4c-11 0-20 9-20 20 0 11 20 36 20 36s20-25 20-36c0-11-9-20-20-20z" fill="#EA580C"/>
-                            <!-- Inner Circle -->
                             <circle cx="32" cy="24" r="12" fill="#FB923C"/>
-                            <!-- Package Icon -->
                             <rect x="24" y="18" width="16" height="12" fill="#FFFFFF"/>
                             <path d="M24 22h16M32 18v12" stroke="#EA580C" stroke-width="1.5"/>
-                            <!-- Motion Lines -->
                             <path d="M14 44l-6 6M50 44l6 6" stroke="#FB923C" stroke-width="2.5" stroke-linecap="round"/>
                         </svg>
                         <span class="text-2xl font-bold">CoDelivery</span>
                     </div>
                     <p class="text-gray-400">Votre partenaire de livraison intelligent disponible 24/7 pour tous vos besoins.</p>
                     <div class="flex space-x-4">
-                        <!-- Social Media Icons -->
                         <a href="#" class="w-10 h-10 bg-orange-900 rounded-full flex items-center justify-center hover:bg-orange-800 transition-colors">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -465,7 +418,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Links -->
                 <div>
                     <h3 class="text-lg font-semibold mb-6">Liens rapides</h3>
                     <ul class="space-y-4">
@@ -476,7 +428,6 @@
                     </ul>
                 </div>
 
-                <!-- Services -->
                 <div>
                     <h3 class="text-lg font-semibold mb-6">Nos services</h3>
                     <ul class="space-y-4">
@@ -487,7 +438,6 @@
                     </ul>
                 </div>
 
-                <!-- Contact -->
                 <div>
                     <h3 class="text-lg font-semibold mb-6">Contact</h3>
                     <ul class="space-y-4">
@@ -515,7 +465,6 @@
             </div>
         </div>
 
-        <!-- Bottom Footer -->
         <div class="border-t border-orange-900">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="md:flex md:items-center md:justify-between">
